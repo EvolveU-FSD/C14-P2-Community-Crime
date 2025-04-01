@@ -1,11 +1,14 @@
 import { Router } from "express";
 import { createCrimeRecord, findAllCrimeRecords, findCrimeById} from '../models/crimes.js';
 
+// Create a new router- This is an automatically created object from express.
 const router = Router();
 
-// Get all crime records.
+// Get ALL crime records.
+// The second parameter is a single function that waits to finish before executing.
 router.get('/', async (req, res) => {
     try {
+        // Run the findAllCrimeRecords function from the crime model.
         const crimeRecord = await findAllCrimeRecords();
         res.send(crimeRecord);  
     }
