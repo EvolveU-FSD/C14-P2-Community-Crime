@@ -26,6 +26,8 @@ const CrimeRecord = mongoose.model('crime', crimeRecordSchema, 'crimes');
 // that has been outlined above.
 // First we make the ability to create a new record by passing all the fields in.
 export async function createCrimeRecord(community, category, crimeCount, year, month) {
+    // Use the CrimeRecord model from above to add a new record to the database.
+    // The create keyword is part of the mongoose connection. 
     const newCrime = await CrimeRecord.create({
         community, 
         category, 
@@ -37,11 +39,15 @@ export async function createCrimeRecord(community, category, crimeCount, year, m
     return newCrime;
 }
 
+// Use the CrimeRecord model to find all records in the collection/table. 
+// In this case the model is built on the "crimes" collection. 
 export async function findAllCrimeRecords() {
     const crimes = await CrimeRecord.find();
     return crimes;
 }
 
+// So far we aren't using this. It's the same as the function above however but it gets a single crime
+// based on the object ID. There's a good chance we'll never have to use this function in our environment.
 export async function findCrimeById(id) {
     const crime = await CrimeRecord.findCrimeById(id);
     return crime;
