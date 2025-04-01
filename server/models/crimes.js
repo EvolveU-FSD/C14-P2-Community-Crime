@@ -1,8 +1,8 @@
-import { connectDb } from "../db";
+import { connectDb } from "../db.js";
 
 const mongoose = await connectDb();
 
-// TODO- Schema
+// Schema
 const crimeRecordSchema = mongoose.Schema({
     community: String,
     category: String,
@@ -11,11 +11,11 @@ const crimeRecordSchema = mongoose.Schema({
     month: Number,
 })
 
-// TODO- Models
+// Models
 const CrimeRecord = mongoose.model('crime', crimeRecordSchema, 'crimes');
 
-// TODO- Functions to expose the tables
-export async function createCrime(community, category, crimeCount, year, month) {
+// Functions to expose the tables
+export async function createCrimeRecord(community, category, crimeCount, year, month) {
     const newCrime = await CrimeRecord.create({
         community, 
         category, 
@@ -25,7 +25,7 @@ export async function createCrime(community, category, crimeCount, year, month) 
     })
 }
 
-export async function findAllCrimes() {
+export async function findAllCrimeRecords() {
     const crimes = await CrimeRecord.find();
     return crimes;
 }
