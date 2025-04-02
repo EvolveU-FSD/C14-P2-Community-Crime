@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/EvolveU-FSD/C14-P2-Community-Crime#readme",
   "dependencies": {
+    "dotenv": "^16.4.7",
     "express": "^5.1.0",
     "mongoose": "^8.13.1"
   },

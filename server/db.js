@@ -1,4 +1,7 @@
 import mongoose from "mongoose";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Set a URL path for the database. This will later be updated to point to Atlas when setup.
 // TODO- Create a linear task to create the Atlas DB.
