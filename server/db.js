@@ -7,6 +7,8 @@ dotenv.config();
 // TODO- Create a linear task to create the Atlas DB.
 const mongo_uri = process.env.MONGO_URI || 'mongodb://localhost:27017/c14-P2-Crimes'
 
+console.log(mongo_uri);
+
 let connectionPromise = null
 
 // Export a function that will be used to create a connection to the database listed above.

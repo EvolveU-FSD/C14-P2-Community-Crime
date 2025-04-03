@@ -22,10 +22,10 @@ export const importCrimeData = async () => {
                crimeRecord.month 
             )
             // TODO: remove- Temporarily writing the new record created.
-            console.log(`Created ${newCrimeRecord}`);
+            // console.log(`Created ${newCrimeRecord}`);
             //TODO: remove- Breaking after writing about 20 records.
             i++;
-            if (i > 20) break;
+            if (i > 50) break;
         }
 
         console.log(`Crime data import completed.`);
