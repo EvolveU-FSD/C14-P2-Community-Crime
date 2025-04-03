@@ -1,5 +1,6 @@
 import express from 'express';
 import crimeRecordRoutes from './routes/crimeRecordRoutes.js';
+import { importCrimeData } from './scheduled/daily.js';
 
 // Outlines the variables needed to run the server.
 const app = express();
@@ -10,6 +11,8 @@ const PORT = process.env.PORT || 3000;
 // (http://localhost:3000)- If there was a /name after 3000, it would go in the '/' section below.
 // Next logic goes to routes/crimeRecordRoutes.js.
 app.use('/', crimeRecordRoutes);
+
+importCrimeData();
 
 // Run the server. Write to console what port it selected.
 const server = app.listen(PORT, () => {
