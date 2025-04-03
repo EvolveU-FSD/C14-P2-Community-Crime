@@ -65,7 +65,17 @@ export const importCrimeData = async () => {
         console.log(`Crime data import completed. Total records: ${totalRecords}`);
         await disconnectDb();
     } catch (error) {
-        console.error(`Import failed: ${error}`);
+        const errorTime = new Date();
+        const durationInSeconds = (endTime - errorTime) / 1000; //Converted to seconds.
+
+        // Convert duration to HH:MM:SS format.
+        const hours = Math.floor(durationInSeconds / 3600);
+        const minutes = Math.floor((durationInSeconds % 3600) / 60);
+        const seconds = Math.floor(durationInSeconds % 60);
+        const formattedDuration = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+        console.error(`Import failed at ${errorTime.toISOString()} after ${formattedDuration}`);
+        console.error(`Error details: ${error}`);
     }
 }
 
