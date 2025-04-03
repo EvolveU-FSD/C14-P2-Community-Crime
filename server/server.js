@@ -1,7 +1,7 @@
 import express from 'express';
 import crimeRecordRoutes from './routes/crimeRecordRoutes.js';
 import communityBoundaryRoutes from './routes/communityBoundaryRoutes.js';
-import { initializeCronJob, importCrimeData } from './scheduled/daily.js';
+import { initializeCronJob } from './scheduled/daily.js';
 
 // Outlines the variables needed to run the server.
 const app = express();
@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 // (http://localhost:3000)- If there was a /name after 3000, it would go in the '/' section below.
 // Next logic goes to routes/crimeRecordRoutes.js.
 app.use('/allCrimes', crimeRecordRoutes);
-app.use('/allcommunities', communityBoundaryRoutes)
+app.use('/allCommunities', communityBoundaryRoutes)
 
 // importCrimeData();
 initializeCronJob();

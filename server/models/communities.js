@@ -20,7 +20,7 @@ const CommunityBoundaryRecord = mongoose.model('communityBoundary', communityBou
 // Create a new record.
 
 // Find one and update.
-export async function findOneAndUpdate(code, name, sector, multiPolygon, createdDate, modifiedDate) {
+export async function communityFindOneAndUpdate(code, name, sector, multiPolygon, createdDate, modifiedDate) {
     try {
         const filter = {
             code: code,
