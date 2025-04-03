@@ -2,7 +2,7 @@ import cron from 'node-cron';
 import { connectDb, disconnectDb } from '../db.js';
 import { findOneAndUpdate } from '../models/crimes.js';
 
-export const importCrimeData = async () => {
+const importCrimeData = async () => {
     try {
         // Make a connection and fetch the data from the city of Calgary API.
         await connectDb();
@@ -33,4 +33,13 @@ export const importCrimeData = async () => {
     } catch (error) {
         console.error(`Import failed: ${error}`);
     }
+}
+
+// Schedule a task to run at 2am every day.
+export const initializeCronJob = () => {
+    cron.schedule('0 2 * * *', () =>{
+        console.log(`Starting daily crime data import at: `, new Date().toISOString());
+        importCrimeData();
+    });
+    console.log(`Crime data import scheduled for 2AM daily.`);
 }
