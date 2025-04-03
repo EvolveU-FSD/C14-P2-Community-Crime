@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 // Navigate to the crimeRecordRoutes file when navigating to the home location
 // (http://localhost:3000)- If there was a /name after 3000, it would go in the '/' section below.
 // Next logic goes to routes/crimeRecordRoutes.js.
-app.use('/', crimeRecordRoutes);
+app.use('/allCrimes', crimeRecordRoutes);
 
 // importCrimeData();
 initializeCronJob();
