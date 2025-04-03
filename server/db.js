@@ -17,7 +17,6 @@ export async function connectDb() {
     // If one doesn't already exist, create a connection.
     if (!connectionPromise) {
         console.log('Connecting to MongoDB...');
-        console.log(`URI`, mongo_uri);
         connectionPromise = mongoose.connect(mongo_uri);
     }
     // Wait until it has been created, then return the connection object.

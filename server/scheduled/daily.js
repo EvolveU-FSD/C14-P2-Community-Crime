@@ -2,33 +2,67 @@ import cron from 'node-cron';
 import { connectDb, disconnectDb } from '../db.js';
 import { findOneAndUpdate } from '../models/crimes.js';
 
-const importCrimeData = async () => {
+// TODO: Change the type of import to pull in all records from the API at once.
+// Based on documentation here: https://support.socrata.com/hc/en-us/articles/202949268-How-to-query-more-than-1000-rows-of-a-dataset
+const BATCH_SIZE = 1000; // Max records that can be imported at a time.
+const BASE_CRIME_URL = "https://data.calgary.ca/resource/78gh-n26t.json";
+
+export const importCrimeData = async () => {
+    const startTime = new Date();
+    console.log(`Starting crime data import at: ${startTime.toISOString()}`);
+
     try {
         // Make a connection and fetch the data from the city of Calgary API.
         await connectDb();
-        const response = await fetch("https://data.calgary.ca/resource/78gh-n26t.json");
-        const crimeData = await response.json();
+        let offset = 0;
+        let totalRecords = 0;
+        let hasMoreRecords = true;
 
-        //TODO: remove when writing more than 20 records.
-        let i = 0;
-        // Process and save each crime.
-        for (const crimeRecord of crimeData) {
-            // Send a request to Crimes to create a new record for each coming from the API.
-            const newCrimeRecord = await findOneAndUpdate(
-               crimeRecord.community,
-               crimeRecord.category,
-               crimeRecord.crime_count,
-               crimeRecord.year,
-               crimeRecord.month 
-            )
-            // TODO: remove- Temporarily writing the new record created.
-            // console.log(`Created ${newCrimeRecord}`);
-            //TODO: remove- Breaking after writing about 20 records.
-            i++;
-            if (i > 50) break;
+        while (hasMoreRecords) {
+            // Build the URL based on the base location you will get data, and how many pages have been 
+            // retrieved to this point of data. Each time you will get more.
+            const url = `${BASE_CRIME_URL}?$limit=${BATCH_SIZE}&$offset=${offset}`;
+            console.log(`Fetching records from offset ${offset}`);
+
+            const response = await fetch(url);
+            const crimeData = await response.json();
+
+            // Check if you received any records from the current offset. 
+            // If there are none then change the flag and get out of the while loop.
+            if (crimeData.length === 0) {
+                hasMoreRecords = false;
+                continue;
+            }
+            // Process and save each crime.
+            for (const crimeRecord of crimeData) {
+                // Send a request to Crimes to create a new record for each coming from the API.
+                const newCrimeRecord = await findOneAndUpdate(
+                crimeRecord.community,
+                crimeRecord.category,
+                crimeRecord.crime_count,
+                crimeRecord.year,
+                crimeRecord.month 
+                )
+                totalRecords++;
+            }
+
+            console.log(`Processed ${crimeData.length} records. Total records: ${totalRecords}`);
+            offset += BATCH_SIZE;
         }
 
-        console.log(`Crime data import completed.`);
+        const endTime = new Date();
+        const durationInSeconds = (endTime - startTime) / 1000; //Converted to seconds.
+
+        // Convert duration to HH:MM:SS format.
+        const hours = Math.floor(durationInSeconds / 3600);
+        const minutes = Math.floor((durationInSeconds % 3600) / 60);
+        const seconds = Math.floor(durationInSeconds % 60);
+        const formattedDuration = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+        // Log the summary of the entire execution.
+        console.log(`Crime data import completed at: ${endTime.toISOString()}`);
+        console.log(`Total duration: ${formattedDuration}`);
+        console.log(`Crime data import completed. Total records: ${totalRecords}`);
         await disconnectDb();
     } catch (error) {
         console.error(`Import failed: ${error}`);
@@ -38,7 +72,6 @@ const importCrimeData = async () => {
 // Schedule a task to run at 2am every day.
 export const initializeCronJob = () => {
     cron.schedule('0 2 * * *', () =>{
-        console.log(`Starting daily crime data import at: `, new Date().toISOString());
         importCrimeData();
     });
     console.log(`Crime data import scheduled for 2AM daily.`);

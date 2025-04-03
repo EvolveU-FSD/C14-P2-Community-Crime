@@ -1,6 +1,6 @@
 import express from 'express';
 import crimeRecordRoutes from './routes/crimeRecordRoutes.js';
-import { initializeCronJob } from './scheduled/daily.js';
+import { initializeCronJob, importCrimeData } from './scheduled/daily.js';
 
 // Outlines the variables needed to run the server.
 const app = express();
@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 3000;
 // Next logic goes to routes/crimeRecordRoutes.js.
 app.use('/', crimeRecordRoutes);
 
+// importCrimeData();
 initializeCronJob();
 
 // Run the server. Write to console what port it selected.
