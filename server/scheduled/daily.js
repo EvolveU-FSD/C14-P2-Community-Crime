@@ -1,13 +1,15 @@
 import cron from 'node-cron';
 import { connectDb, disconnectDb } from '../db.js';
 import { findOneAndUpdate } from '../models/crimes.js';
+import { communityFindOneAndUpdate  } from '../models/communities.js';
 
 // TODO: Change the type of import to pull in all records from the API at once.
 // Based on documentation here: https://support.socrata.com/hc/en-us/articles/202949268-How-to-query-more-than-1000-rows-of-a-dataset
 const BATCH_SIZE = 1000; // Max records that can be imported at a time.
 const BASE_CRIME_URL = "https://data.calgary.ca/resource/78gh-n26t.json";
+const BASE_COMMUNITY_BOUNDARY_URL = "https://data.calgary.ca/resource/surr-xmvs.json";
 
-export const importCrimeData = async () => {
+const importCrimeData = async () => {
     const startTime = new Date();
     console.log(`Starting crime data import at: ${startTime.toISOString()}`);
 
@@ -66,7 +68,77 @@ export const importCrimeData = async () => {
         await disconnectDb();
     } catch (error) {
         const errorTime = new Date();
-        const durationInSeconds = (endTime - errorTime) / 1000; //Converted to seconds.
+        const durationInSeconds = (startTime - errorTime) / 1000; //Converted to seconds.
+
+        // Convert duration to HH:MM:SS format.
+        const hours = Math.floor(durationInSeconds / 3600);
+        const minutes = Math.floor((durationInSeconds % 3600) / 60);
+        const seconds = Math.floor(durationInSeconds % 60);
+        const formattedDuration = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+        console.error(`Import failed at ${errorTime.toISOString()} after ${formattedDuration}`);
+        console.error(`Error details: ${error}`);
+        await disconnectDb();
+    }
+}
+
+const importCommunityBoundaryData = async () => {
+    const startTime = new Date();
+    console.log(`Starting crime data import at: ${startTime.toISOString()}`);
+
+    try {
+        await connectDb();
+        let offset = 0;
+        let totalRecords = 0;
+        let hasMoreRecords = true;
+
+        while (hasMoreRecords) {
+            const url = `${BASE_COMMUNITY_BOUNDARY_URL}?$limit=${BATCH_SIZE}&$offset=${offset}`;
+            console.log(`Fetching records from offset ${offset}`);
+
+            const response = await fetch(url);
+            const boundaryData = await response.json();
+
+            if (boundaryData.length === 0) {
+                hasMoreRecords = false;
+                continue;
+            }
+
+            for (const boundaryRecord of boundaryData) {
+                console.log(boundaryRecord);
+                const newBoundaryRecord = await communityFindOneAndUpdate (
+                    boundaryRecord.comm_code,
+                    boundaryRecord.name,
+                    boundaryRecord.sector,
+                    // boundaryRecord.multipolygon,
+                    boundaryRecord.created_dt,
+                    boundaryRecord.modified_dt
+                )
+                console.log(newBoundaryRecord);
+                totalRecords++;
+            }
+
+            console.log(`Processed ${boundaryData.length} records. Total records: ${totalRecords}`);
+            offset += BATCH_SIZE;
+        }
+
+        const endTime = new Date();
+        const durationInSeconds = (endTime - startTime) / 1000;
+        
+        // Convert duration to HH:MM:SS format.
+        const hours = Math.floor(durationInSeconds / 3600);
+        const minutes = Math.floor((durationInSeconds % 3600) / 60);
+        const seconds = Math.floor(durationInSeconds % 60);
+        const formattedDuration = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+        // Log the summary of the entire execution.
+        console.log(`Crime data import completed at: ${endTime.toISOString()}`);
+        console.log(`Total duration: ${formattedDuration}`);
+        console.log(`Crime data import completed. Total records: ${totalRecords}`);
+        await disconnectDb();
+    } catch (error) {
+        const errorTime = new Date();
+        const durationInSeconds = (startTime - errorTime) / 1000; //Converted to seconds.
 
         // Convert duration to HH:MM:SS format.
         const hours = Math.floor(durationInSeconds / 3600);
@@ -86,4 +158,5 @@ export const initializeCronJob = () => {
         importCrimeData();
     });
     console.log(`Crime data import scheduled for 2AM daily.`);
+    importCommunityBoundaryData();
 }
