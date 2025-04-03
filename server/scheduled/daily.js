@@ -76,6 +76,7 @@ export const importCrimeData = async () => {
 
         console.error(`Import failed at ${errorTime.toISOString()} after ${formattedDuration}`);
         console.error(`Error details: ${error}`);
+        await disconnectDb();
     }
 }
 
