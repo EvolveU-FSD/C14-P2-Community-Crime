@@ -8,7 +8,7 @@ const communityBoundarySchema = mongoose.Schema({
     code: String,
     name: String,
     sector: String,
-    multiPolygon: String,
+    // multiPolygon: multiPolygon,
     createdDate: Date,
     modifiedDate: Date
 })
