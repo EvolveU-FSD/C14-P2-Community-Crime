@@ -2,6 +2,7 @@ import cron from 'node-cron';
 import { connectDb, disconnectDb } from '../db.js';
 import { findOneAndUpdate } from '../models/crimes.js';
 import { communityFindOneAndUpdate  } from '../models/communities.js';
+import { getDatasetMetadata } from '../util/apiUtils.js';
 
 // TODO: Change the type of import to pull in all records from the API at once.
 // Based on documentation here: https://support.socrata.com/hc/en-us/articles/202949268-How-to-query-more-than-1000-rows-of-a-dataset
@@ -19,6 +20,10 @@ const importCrimeData = async () => {
         let offset = 0;
         let totalRecords = 0;
         let hasMoreRecords = true;
+
+        // Only used for building purposes to get information about the API.
+        // TODO: Check the metadata against what we expect to validate the columns haven't changed.
+        getDatasetMetadata(BASE_CRIME_URL);
 
         while (hasMoreRecords) {
             // Build the URL based on the base location you will get data, and how many pages have been 
@@ -96,6 +101,10 @@ const importCommunityBoundaryData = async () => {
             const url = `${BASE_COMMUNITY_BOUNDARY_URL}?$limit=${BATCH_SIZE}&$offset=${offset}`;
             console.log(`Fetching records from offset ${offset}`);
 
+            // Only used for building purposes to get information about the API.
+            // TODO: Check the metadata against what we expect to validate the columns haven't changed.
+            getDatasetMetadata(BASE_COMMUNITY_BOUNDARY_URL);
+
             const response = await fetch(url);
             const boundaryData = await response.json();
 
@@ -105,7 +114,7 @@ const importCommunityBoundaryData = async () => {
             }
 
             for (const boundaryRecord of boundaryData) {
-                console.log(boundaryRecord);
+                // console.log(boundaryRecord);
                 const newBoundaryRecord = await communityFindOneAndUpdate (
                     boundaryRecord.comm_code,
                     boundaryRecord.name,
@@ -114,7 +123,7 @@ const importCommunityBoundaryData = async () => {
                     boundaryRecord.created_dt,
                     boundaryRecord.modified_dt
                 )
-                console.log(newBoundaryRecord);
+                // console.log(newBoundaryRecord);
                 totalRecords++;
             }
 
