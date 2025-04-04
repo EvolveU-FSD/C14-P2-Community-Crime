@@ -7,7 +7,8 @@ import { getDatasetMetadata } from '../util/apiUtils.js';
 // TODO: Change the type of import to pull in all records from the API at once.
 // Based on documentation here: https://support.socrata.com/hc/en-us/articles/202949268-How-to-query-more-than-1000-rows-of-a-dataset
 const BATCH_SIZE = 1000; // Max records that can be imported at a time.
-const BASE_CRIME_URL = "https://data.calgary.ca/resource/78gh-n26t.json";
+// const BASE_CRIME_URL = "https://data.calgary.ca/resource/78gh-n26t.json";
+const BASE_CRIME_URL = "https://data.calgarypolice.ca/api/v2/datasets/crime-statistics";
 const BASE_COMMUNITY_BOUNDARY_URL = "https://data.calgary.ca/resource/surr-xmvs.json";
 
 const importCrimeData = async () => {
@@ -167,5 +168,6 @@ export const initializeCronJob = () => {
         importCrimeData();
     });
     console.log(`Crime data import scheduled for 2AM daily.`);
-    importCommunityBoundaryData();
+    // importCommunityBoundaryData();
+    importCrimeData();
 }
