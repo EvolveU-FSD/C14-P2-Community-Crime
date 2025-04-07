@@ -3,6 +3,7 @@ import { connectDb, disconnectDb } from '../db.js';
 import { findOneAndUpdate } from '../models/crimes.js';
 import { communityFindOneAndUpdate  } from '../models/communities.js';
 import { getDatasetMetadata } from '../util/apiUtils.js';
+import { parseWKTToGeoJSON } from '../util/parseWKTToGeoJSON.js';
 
 // TODO: Change the type of import to pull in all records from the API at once.
 // Based on documentation here: https://support.socrata.com/hc/en-us/articles/202949268-How-to-query-more-than-1000-rows-of-a-dataset
@@ -104,7 +105,7 @@ const importCommunityBoundaryData = async () => {
 
             // Only used for building purposes to get information about the API.
             // TODO: Check the metadata against what we expect to validate the columns haven't changed.
-            getDatasetMetadata(BASE_COMMUNITY_BOUNDARY_URL);
+            // getDatasetMetadata(BASE_COMMUNITY_BOUNDARY_URL);
 
             const response = await fetch(url);
             const boundaryData = await response.json();
@@ -115,11 +116,25 @@ const importCommunityBoundaryData = async () => {
             }
 
             for (const boundaryRecord of boundaryData) {
-                // console.log(boundaryRecord);
+                // Convert the Multipolygon to a string first.
+                const wktString = typeof boundaryRecord.multipolygon === "String"
+                    ? boundaryRecord.multipolygon
+                    : boundaryRecord.multipolygon.toString();
+
+                console.log("multipolygon record.")
+                console.log(boundaryRecord.multipolygon)
+                    
+                // The Multipolygon from the API needs to be parsed:
+                console.log(JSON.stringify(wktString)
+            )
+                console.log(`WKT type: ${wktString}`)
+                const boundaryPolygon = parseWKTToGeoJSON(wktString);
+                
                 const newBoundaryRecord = await communityFindOneAndUpdate (
                     boundaryRecord.comm_code,
                     boundaryRecord.name,
                     boundaryRecord.sector,
+                    boundaryPolygon, 
                     // boundaryRecord.multipolygon,
                     boundaryRecord.created_dt,
                     boundaryRecord.modified_dt
@@ -168,6 +183,6 @@ export const initializeCronJob = () => {
         importCrimeData();
     });
     console.log(`Crime data import scheduled for 2AM daily.`);
-    // importCommunityBoundaryData();
-    importCrimeData();
+    importCommunityBoundaryData();
+    // importCrimeData();
 }
