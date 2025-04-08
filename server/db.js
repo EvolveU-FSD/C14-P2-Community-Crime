@@ -7,7 +7,8 @@ dotenv.config();
 // TODO- Create a linear task to create the Atlas DB.
 const mongo_uri = process.env.MONGO_URI || 'mongodb://localhost:27017/c14-P2-Crimes'
 
-console.log(mongo_uri);
+// TODO: remove the console log when all members are set up with Atlas.
+//console.log(mongo_uri);
 
 let connectionPromise = null
 
