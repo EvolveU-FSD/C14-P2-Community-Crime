@@ -77,7 +77,7 @@ const importCrimeData = async () => {
         await disconnectDb();
     } catch (error) {
         const errorTime = new Date();
-        const durationInSeconds = (startTime - errorTime) / 1000; //Converted to seconds.
+        const durationInSeconds = (errorTime - startTime) / 1000; //Converted to seconds.
 
         // Convert duration to HH:MM:SS format.
         const hours = Math.floor(durationInSeconds / 3600);
@@ -152,7 +152,7 @@ const importCommunityBoundaryData = async () => {
         await disconnectDb();
     } catch (error) {
         const errorTime = new Date();
-        const durationInSeconds = (startTime - errorTime) / 1000; //Converted to seconds.
+        const durationInSeconds = (errorTime - startTime)  / 1000; //Converted to seconds.
 
         // Convert duration to HH:MM:SS format.
         const hours = Math.floor(durationInSeconds / 3600);
