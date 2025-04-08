@@ -7,8 +7,8 @@ import { getDatasetMetadata } from '../util/apiUtils.js';
 // TODO: Change the type of import to pull in all records from the API at once.
 // Based on documentation here: https://support.socrata.com/hc/en-us/articles/202949268-How-to-query-more-than-1000-rows-of-a-dataset
 const BATCH_SIZE = 1000; // Max records that can be imported at a time.
-// const BASE_CRIME_URL = "https://data.calgary.ca/resource/78gh-n26t.json";
-const BASE_CRIME_URL = "https://data.calgarypolice.ca/api/v2/datasets/crime-statistics";
+const BASE_CRIME_URL = "https://data.calgary.ca/resource/78gh-n26t.json";
+// const BASE_CRIME_URL = "https://data.calgarypolice.ca/api/v2/datasets/crime-statistics";
 const BASE_COMMUNITY_BOUNDARY_URL = "https://data.calgary.ca/resource/surr-xmvs.json";
 
 const importCrimeData = async () => {
@@ -24,7 +24,9 @@ const importCrimeData = async () => {
 
         // Only used for building purposes to get information about the API.
         // TODO: Check the metadata against what we expect to validate the columns haven't changed.
-        getDatasetMetadata(BASE_CRIME_URL);
+
+        // This is a testing line to get the metadata information from the URL. Currently not needed in prod.
+        // getDatasetMetadata(BASE_CRIME_URL);
 
         while (hasMoreRecords) {
             // Build the URL based on the base location you will get data, and how many pages have been 
@@ -58,6 +60,7 @@ const importCrimeData = async () => {
             offset += BATCH_SIZE;
         }
 
+        // Write a log on the server every time the process runs. It will calculate how long it ran for and outline how many records it processed.
         const endTime = new Date();
         const durationInSeconds = (endTime - startTime) / 1000; //Converted to seconds.
 
@@ -88,6 +91,9 @@ const importCrimeData = async () => {
     }
 }
 
+// The importCommunityBoundaryData process is largely the same as the one for crime. To understand how it works, refer to importCrimeData please.
+// TODO: It is worth considering if these functions can be combined and executed based on parameters if time permits.
+// If not, they should be split out to their own files.
 const importCommunityBoundaryData = async () => {
     const startTime = new Date();
     console.log(`Starting crime data import at: ${startTime.toISOString()}`);
@@ -104,7 +110,7 @@ const importCommunityBoundaryData = async () => {
 
             // Only used for building purposes to get information about the API.
             // TODO: Check the metadata against what we expect to validate the columns haven't changed.
-            getDatasetMetadata(BASE_COMMUNITY_BOUNDARY_URL);
+            // getDatasetMetadata(BASE_COMMUNITY_BOUNDARY_URL);
 
             const response = await fetch(url);
             const boundaryData = await response.json();
@@ -115,16 +121,14 @@ const importCommunityBoundaryData = async () => {
             }
 
             for (const boundaryRecord of boundaryData) {
-                // console.log(boundaryRecord);
                 const newBoundaryRecord = await communityFindOneAndUpdate (
                     boundaryRecord.comm_code,
                     boundaryRecord.name,
                     boundaryRecord.sector,
-                    // boundaryRecord.multipolygon,
+                    boundaryRecord.multipolygon,
                     boundaryRecord.created_dt,
                     boundaryRecord.modified_dt
                 )
-                // console.log(newBoundaryRecord);
                 totalRecords++;
             }
 
@@ -166,8 +170,7 @@ const importCommunityBoundaryData = async () => {
 export const initializeCronJob = () => {
     cron.schedule('0 2 * * *', () =>{
         importCrimeData();
+        importCommunityBoundaryData();
     });
     console.log(`Crime data import scheduled for 2AM daily.`);
-    // importCommunityBoundaryData();
-    importCrimeData();
 }

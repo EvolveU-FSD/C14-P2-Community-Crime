@@ -9,6 +9,17 @@ const communityBoundarySchema = mongoose.Schema({
     name: String,
     sector: String,
     // multiPolygon: multiPolygon,
+    multiPolygon: {
+        type: {
+            type: String,
+            enum: ['MultiPolygon'],
+            required: true
+        },
+        coordinates: {
+            type: [[[[Number]]]],
+            required: true
+        }
+    },
     createdDate: Date,
     modifiedDate: Date
 })
