@@ -77,7 +77,7 @@ const importCrimeData = async () => {
         await disconnectDb();
     } catch (error) {
         const errorTime = new Date();
-        const durationInSeconds = (startTime - errorTime) / 1000; //Converted to seconds.
+        const durationInSeconds = (errorTime - startTime) / 1000; //Converted to seconds.
 
         // Convert duration to HH:MM:SS format.
         const hours = Math.floor(durationInSeconds / 3600);
@@ -146,13 +146,13 @@ const importCommunityBoundaryData = async () => {
         const formattedDuration = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
         // Log the summary of the entire execution.
-        console.log(`Crime data import completed at: ${endTime.toISOString()}`);
+        console.log(`Community data import completed at: ${endTime.toISOString()}`);
         console.log(`Total duration: ${formattedDuration}`);
-        console.log(`Crime data import completed. Total records: ${totalRecords}`);
+        console.log(`Community data import completed. Total records: ${totalRecords}`);
         await disconnectDb();
     } catch (error) {
         const errorTime = new Date();
-        const durationInSeconds = (startTime - errorTime) / 1000; //Converted to seconds.
+        const durationInSeconds = (errorTime - startTime) / 1000; //Converted to seconds.
 
         // Convert duration to HH:MM:SS format.
         const hours = Math.floor(durationInSeconds / 3600);
