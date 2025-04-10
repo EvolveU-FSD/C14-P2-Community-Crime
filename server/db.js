@@ -7,6 +7,9 @@ dotenv.config();
 // TODO- Create a linear task to create the Atlas DB.
 const mongo_uri = process.env.MONGO_URI || 'mongodb://localhost:27017/c14-P2-Crimes'
 
+// TODO: remove the console log when all members are set up with Atlas.
+//console.log(mongo_uri);
+
 let connectionPromise = null
 
 // Export a function that will be used to create a connection to the database listed above.
@@ -14,6 +17,7 @@ let connectionPromise = null
 export async function connectDb() {
     // If one doesn't already exist, create a connection.
     if (!connectionPromise) {
+        console.log('Connecting to MongoDB...');
         connectionPromise = mongoose.connect(mongo_uri);
     }
     // Wait until it has been created, then return the connection object.
