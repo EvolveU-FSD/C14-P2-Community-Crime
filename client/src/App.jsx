@@ -7,6 +7,11 @@ function App() {
     <>
       <h1>Hello Alia</h1>
       <p>Here's your starting page for the map</p>
+
+      <br />
+
+      <h2>Also here's the API data we can play with!</h2>
+      <CrimeDataDisplay />
     </>
   )
 }

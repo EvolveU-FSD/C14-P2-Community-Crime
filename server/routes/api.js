@@ -7,7 +7,6 @@ const router = express.Router();
 router.get('/api/allCommunities', async (req, res) => {
     try {
         const communities = await findAllCommunityBoundaries();
-        console.log(communities)
         res.json(communities);
     } catch (error) {
         res.status(500).json({ message: error.message });
