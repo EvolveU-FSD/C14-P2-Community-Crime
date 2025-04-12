@@ -16,7 +16,7 @@ const PORT = process.env.PORT || 3000;
 // Next logic goes to routes/crimeRecordRoutes.js.
 app.use('/allCrimes', crimeRecordRoutes);
 app.use('/allCommunities', communityBoundaryRoutes)
-app.use(apiRoutes);
+app.use('/api', apiRoutes);
 
 // importCrimeData();
 initializeCronJob();
