@@ -13,7 +13,7 @@ export async function getCrimesByCommunity() {
                 // Within Mongoose create a group variable. The key is the community field and will then crime by that value.
                 $group: {
                     _id: "$community",
-                    totalCrimes: { $sum: "$crimeCount"},
+                    totalCrimes: { $sum: "$crimeCount" },
                     crimesByCategory: {
                         // In addition to the original grouping, a second grouping exists to also split by crime.
                         $push: {
@@ -58,5 +58,36 @@ export async function getCrimesByCategoryAndCommunity(community) {
     } catch (error) {
         console.error(`Error in getCrimesByCategoryAndCommunity: ${error}`);
         throw error;
+    }
+}
+
+// Get a summary of crimes by year as an option in the breakdown.
+// Should be useful for graphing in the front end to see trends.
+export async function getCrimesByCommunityAndYear() {
+    try {
+        const crimeSummary = CrimeRecord.aggregate([
+            {
+                $match: {
+                    community: community,
+                    year: year
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        category: "$category",
+                        year: "$year",
+                    },
+                    totalCrimes: { $sum: "crimeCount" }
+                }
+            },
+            {
+                $sort: { totalCrimes: -1 }
+            }
+
+        ]);
+        return crimeSummary;
+    } catch (error) {
+        console.error(`Error in getCrimesByCommunityAndYear: ${error}`);
     }
 }
