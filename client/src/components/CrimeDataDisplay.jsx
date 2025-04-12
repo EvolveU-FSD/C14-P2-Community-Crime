@@ -3,26 +3,33 @@ import { useEffect, useState } from "react"
 const CrimeDataDisplay = () => {
     const [crimes, setCrimes] = useState([]);
     const [communities, setCommunities] = useState([]);
+    const [crimeSummary, setCrimeSummary] = useState([]);
     const [loading, setLoading] = useState([]);
     const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [crimesResponse, communitiesResponse] = await Promise.all([
+                const [crimesResponse, communitiesResponse, summaryResponse] = await Promise.all([
                     await fetch('/api/allCrimes'),
-                    await fetch('/api/allCommunities')
+                    await fetch('/api/allCommunities'),
+                    await fetch('/api/crimeSummary')
                 ]);
 
-                if (!crimesResponse.ok || !communitiesResponse.ok) {
+                if (!crimesResponse.ok 
+                    || !communitiesResponse.ok
+                    || !summaryResponse.ok
+                ) {
                     throw new Error('Internal API call error');
                 }
 
                 const crimesData = await crimesResponse.json();
                 const communitiesData = await communitiesResponse.json();
+                const summaryData = await summaryResponse.json();
 
                 setCrimes(crimesData);
                 setCommunities(communitiesData);
+                setCrimeSummary(summaryData);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -56,6 +63,26 @@ const CrimeDataDisplay = () => {
                         ))}
                     </tbody>
                 </table>
+            </div>
+
+            <h2>Crime Summary by Community</h2>
+            <div style={{ maxHeight: '300px', overflow: 'auto' }}>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Community</th>
+                        <th>Total Crimes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {crimeSummary.map((summary) => (
+                        <tr key={summary._id}>
+                            <td>{summary._id}</td>
+                            <td>{summary.totalCrimes}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
             </div>
 
             <h2>Crime Data</h2>
