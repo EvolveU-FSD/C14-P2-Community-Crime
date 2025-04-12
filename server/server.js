@@ -1,6 +1,7 @@
 import express from 'express';
 import crimeRecordRoutes from './routes/crimeRecordRoutes.js';
 import communityBoundaryRoutes from './routes/communityBoundaryRoutes.js';
+import apiRoutes from './routes/api.js';
 import { initializeCronJob } from './scheduled/daily.js';
 
 //Small change to trigger a PR.
@@ -15,6 +16,7 @@ const PORT = process.env.PORT || 3000;
 // Next logic goes to routes/crimeRecordRoutes.js.
 app.use('/allCrimes', crimeRecordRoutes);
 app.use('/allCommunities', communityBoundaryRoutes)
+app.use('/api', apiRoutes);
 
 // importCrimeData();
 initializeCronJob();
