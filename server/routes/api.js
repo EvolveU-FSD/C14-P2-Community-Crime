@@ -1,7 +1,7 @@
 import express from 'express';
 import { findAllCommunityBoundaries } from '../models/communities.js';
 import { findAllCrimeRecords } from '../models/crimes.js';
-import { getCrimesByCategoryAndCommunity, getCrimesByCommunity } from '../models/summaries.js';
+import { getCrimesByCategoryAndCommunity, getCrimesByCommunity, getCrimesByCommunityAndYear } from '../models/summaries.js';
 
 const router = express.Router();
 
@@ -39,6 +39,16 @@ router.get('/crimeSummary', async (req, res) => {
 router.get('/crimeSummary/:community', async (req, res) => {
     try {
         const summary = await getCrimesByCategoryAndCommunity(req.params.community);
+        res.json(summary);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Give the option to return crimes summarized by year by community.
+router.get('/crimeSummaryByYear', async (req, res) => {
+    try {
+        const summary = await getCrimesByCommunityAndYear();
         res.json(summary);
     } catch (error) {
         res.status(500).json({ message: error.message });
