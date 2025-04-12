@@ -4,7 +4,7 @@ import { findAllCrimeRecords } from '../models/crimes.js';
 
 const router = express.Router();
 
-router.get('/api/allCommunities', async (req, res) => {
+router.get('/allCommunities', async (req, res) => {
     try {
         const communities = await findAllCommunityBoundaries();
         res.json(communities);
@@ -13,7 +13,7 @@ router.get('/api/allCommunities', async (req, res) => {
     }
 });
 
-router.get('/api/allCrimes', async (req, res) => {
+router.get('/allCrimes', async (req, res) => {
     try {
         const crimes = await findAllCrimeRecords();
         res.json(crimes);
