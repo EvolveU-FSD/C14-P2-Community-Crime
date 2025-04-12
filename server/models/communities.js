@@ -62,7 +62,7 @@ export async function communityFindOneAndUpdate(code, name, sector, multiPolygon
 
 // Export all records.
 export async function findAllCommunityBoundaries() {
-    const communityBoundaries = await CommunityBoundaryRecord.find();
+    const communityBoundaries = await CommunityBoundaryRecord.find({});
     return communityBoundaries;
 }
 
