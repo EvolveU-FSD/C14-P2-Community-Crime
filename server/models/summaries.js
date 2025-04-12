@@ -65,29 +65,28 @@ export async function getCrimesByCategoryAndCommunity(community) {
 // Should be useful for graphing in the front end to see trends.
 export async function getCrimesByCommunityAndYear() {
     try {
-        const crimeSummary = CrimeRecord.aggregate([
-            {
-                $match: {
-                    community: community,
-                    year: year
-                }
-            },
+        const crimeSummary = await CrimeRecord.aggregate([
             {
                 $group: {
                     _id: {
-                        category: "$category",
+                        community: "$community",
                         year: "$year",
                     },
-                    totalCrimes: { $sum: "crimeCount" }
+                    totalCrimes: { $sum: "$crimeCount" }
                 }
             },
             {
-                $sort: { totalCrimes: -1 }
+                $sort: { 
+                    "_id.community": -1,
+                    "_id.year": -1,
+                    "totalCrimes": -1
+                }
             }
 
         ]);
         return crimeSummary;
     } catch (error) {
         console.error(`Error in getCrimesByCommunityAndYear: ${error}`);
+        throw error;
     }
 }
