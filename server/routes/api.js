@@ -5,6 +5,7 @@ import { getCrimesByCategoryAndCommunity, getCrimesByCommunity } from '../models
 
 const router = express.Router();
 
+// When the user navigates to allCommunities they get the raw JSON of everything.
 router.get('/allCommunities', async (req, res) => {
     try {
         const communities = await findAllCommunityBoundaries();
@@ -14,6 +15,7 @@ router.get('/allCommunities', async (req, res) => {
     }
 });
 
+// When navigating to allCrimes it returns raw JSON of all our crime records.
 router.get('/allCrimes', async (req, res) => {
     try {
         const crimes = await findAllCrimeRecords();
@@ -23,6 +25,7 @@ router.get('/allCrimes', async (req, res) => {
     }
 });
 
+// Based on the crimeSummary url, call the summary function to summarize the count.
 router.get('/crimeSummary', async (req, res) => {
     try {
         const summary = await getCrimesByCommunity();
@@ -32,6 +35,7 @@ router.get('/crimeSummary', async (req, res) => {
     }
 });
 
+// If giving a single community, return summarized crime data, broken down by crime type.
 router.get('/crimeSummary/:community', async (req, res) => {
     try {
         const summary = await getCrimesByCategoryAndCommunity(req.params.community);
