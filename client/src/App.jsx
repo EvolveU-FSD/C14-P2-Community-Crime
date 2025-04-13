@@ -1,7 +1,8 @@
 // App.jsx
-import { MapContainer, TileLayer, useMap } from 'react-leaflet';
-import { useEffect } from 'react';
-import L from 'leaflet';
+import { MapContainer, TileLayer } from 'react-leaflet';
+import './App.css';
+// import { useEffect } from 'react';
+// import L from 'leaflet';
 // import 'leaflet.heat';
 // import 'leaflet/dist/leaflet.css';
 
@@ -43,15 +44,14 @@ function App () {
     <MapContainer
       center={[51.0447, -114.0719]} // Calgary center
       zoom={12}
-      style={{ height: '100vh', width: '100%' }}
+      className="leaflet-container"
     >
       <TileLayer
-        attribution='&copy; OpenStreetMap contributors'
-        url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      {/* <HeatmapLayer data={heatmapPoints} /> */}
     </MapContainer>
-  );
+  )
 };
 
 export default App;
