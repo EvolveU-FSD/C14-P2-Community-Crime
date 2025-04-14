@@ -168,9 +168,9 @@ const importCommunityBoundaryData = async () => {
 
 // Schedule a task to run at 2am every day.
 export const initializeCronJob = () => {
-    cron.schedule('0 2 * * *', () =>{
+    cron.schedule('0 2 6 * *', () =>{
         importCrimeData();
         importCommunityBoundaryData();
     });
-    console.log(`Crime data import scheduled for 2AM daily.`);
+    console.log(`Crime data import scheduled for 2AM monthly.`);
 }
