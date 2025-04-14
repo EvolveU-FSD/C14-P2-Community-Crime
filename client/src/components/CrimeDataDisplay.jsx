@@ -18,7 +18,8 @@ const CrimeDataDisplay = () => {
                     await fetch('/api/crimeSummaryByYear')
                 ]);
 
-                if (!crimesResponse.ok 
+                if (
+                    !crimesResponse.ok 
                     || !communitiesResponse.ok
                     || !summaryResponse.ok
                     || !summaryByYearResponse.ok
