@@ -19,7 +19,7 @@ const crimeRecordSchema = mongoose.Schema({
 // Models
 // The model is information that mongoose will use to talk to the Mongo database.
 // It will enforce the schema created above and place the information into the 'crimes' collection/table.
-const CrimeRecord = mongoose.model('crime', crimeRecordSchema, 'crimeData');
+export const CrimeRecord = mongoose.model('crime', crimeRecordSchema, 'crimeData');
 
 // Functions to expose the tables/collection
 // Everything below will be exported so that we can actually make use of the model and collection
