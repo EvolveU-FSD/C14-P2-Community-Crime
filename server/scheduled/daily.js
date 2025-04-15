@@ -1,7 +1,7 @@
 import cron from 'node-cron';
 import { connectDb, disconnectDb } from '../db.js';
 import { findOneAndUpdate } from '../models/crimes.js';
-import { communityFindOneAndUpdate  } from '../models/communities.js';
+import { communityFindOneAndUpdate  } from '../models/communityBoundary.js';
 import { getDatasetMetadata } from '../util/apiUtils.js';
 
 // TODO: Change the type of import to pull in all records from the API at once.
@@ -94,9 +94,9 @@ const importCrimeData = async () => {
 // The importCommunityBoundaryData process is largely the same as the one for crime. To understand how it works, refer to importCrimeData please.
 // TODO: It is worth considering if these functions can be combined and executed based on parameters if time permits.
 // If not, they should be split out to their own files.
-const importCommunityBoundaryData = async () => {
+export const importCommunityBoundaryData = async () => {
     const startTime = new Date();
-    console.log(`Starting crime data import at: ${startTime.toISOString()}`);
+    console.log(`Starting community boundary data import at: ${startTime.toISOString()}`);
 
     try {
         await connectDb();
@@ -125,7 +125,7 @@ const importCommunityBoundaryData = async () => {
                     boundaryRecord.comm_code,
                     boundaryRecord.name,
                     boundaryRecord.sector,
-                    boundaryRecord.multipolygon,
+                    boundaryRecord.boundary,
                     boundaryRecord.created_dt,
                     boundaryRecord.modified_dt
                 )

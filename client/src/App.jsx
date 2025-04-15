@@ -1,6 +1,8 @@
 // App.jsx
-import { MapContainer, TileLayer } from 'react-leaflet';
+import { MapContainer, Polyline, TileLayer, useMap } from 'react-leaflet';
 import './App.css';
+import { useEffect, useState } from 'react';
+import { findAllCommunityBoundaries } from './api';
 // import { useEffect } from 'react';
 // import L from 'leaflet';
 // import 'leaflet.heat';
@@ -24,6 +26,30 @@ import './App.css';
 //   return null;
 // };
 
+function CommunityBoundaries() {
+  const [communityBoundary, setCommunityBoundary] = useState([]);
+
+  useEffect(() => {
+    console.log(`Getting community boundaries`);
+    findAllCommunityBoundaries().then((e) => {
+      setCommunityBoundary(e)
+      console.log(`Found ${e.length} boundaries`);
+    })
+  }, [])
+
+  communityBoundary.map((community) => {
+    console.log(`${community.code}: with name ${community.name}`)
+  })
+
+  const fillBlueOption = { color: 'blue' };
+  return communityBoundary.map((community) => {
+    <Polyline 
+      key={community._id}
+      pathOptions={fillBlueOption}
+      positions={community.boundary.coordinates[0]} />
+  })
+}
+
 function App () {
 
   // Sample heat data for Calgary (latitude, longitude, intensity)
@@ -40,6 +66,23 @@ function App () {
   //   [51.1000, -114.0682, 0.7], // Huntington Hills
   // ];
 
+  // Draw some basic polygons. Start from beltline data to ensure we know where the points are:
+  const tempMultiPolygon = [
+    [
+      [51.037831, -114.0742562],
+      [51.0378312, -114.0715175],
+      [51.0378313, -114.0685169],
+      [51.0378314, -114.0660451],
+      [51.0378313, -114.0635768],
+      [51.0378313, -114.0611155],
+      [51.0370668, -114.0611716],
+      [51.037831, -114.0742562]
+    ]
+  ]
+
+  // Set a default colour for now.
+  const fillBlueOption = { color: 'blue' };
+
   return (
     <MapContainer
       center={[51.0447, -114.0719]} // Calgary center
@@ -50,6 +93,9 @@ function App () {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+
+      {/* <Polyline pathOptions={fillBlueOption} positions={tempMultiPolygon} /> */}
+      <CommunityBoundaries />
     </MapContainer>
   )
 };

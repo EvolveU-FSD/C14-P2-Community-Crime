@@ -1,5 +1,5 @@
 import express from 'express';
-import { findAllCommunityBoundaries } from '../models/communities.js';
+import { findAllCommunityBoundaries } from '../models/communityBoundary.js';
 import { findAllCrimeRecords } from '../models/crimes.js';
 import { getCrimesByCategoryAndCommunity, getCrimesByCommunity, getCrimesByCommunityAndYear } from '../models/summaries.js';
 

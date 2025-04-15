@@ -3,9 +3,15 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+let defaultURI = 'mongodb://localhost:27017/c14-P2-Crimes';
+
 // Set a URL path for the database. This will later be updated to point to Atlas when setup.
 // TODO- Create a linear task to create the Atlas DB.
-const mongo_uri = process.env.MONGO_URI || 'mongodb://localhost:27017/c14-P2-Crimes'
+const mongo_uri = process.env.MONGO_URI || defaultURI;
+
+if (mongo_uri === defaultURI) {
+    console.log(`NOTE, .env server is not working or not set up. Using default localhost Mongo connection.`);
+}
 
 // TODO: remove the console log when all members are set up with Atlas.
 // console.log(mongo_uri);
