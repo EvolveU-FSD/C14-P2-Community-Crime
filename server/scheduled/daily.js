@@ -1,7 +1,7 @@
 import cron from 'node-cron';
 import { connectDb, disconnectDb } from '../db.js';
 import { findOneAndUpdate } from '../models/crimes.js';
-import { communityFindOneAndUpdate  } from '../models/communityBoundary.js';
+import { communityFindOneAndUpdate, createCommunityBoundary, findCommunityBoundaryByCommCode  } from '../models/communityBoundary.js';
 import { getDatasetMetadata } from '../util/apiUtils.js';
 
 // TODO: Change the type of import to pull in all records from the API at once.
@@ -121,14 +121,34 @@ export const importCommunityBoundaryData = async () => {
             }
 
             for (const boundaryRecord of boundaryData) {
-                const newBoundaryRecord = await communityFindOneAndUpdate (
-                    boundaryRecord.comm_code,
-                    boundaryRecord.name,
-                    boundaryRecord.sector,
-                    boundaryRecord.boundary,
-                    boundaryRecord.created_dt,
-                    boundaryRecord.modified_dt
-                )
+                const {
+                    comm_code,
+                    name,
+                    sector,
+                    multipolygon,
+                    created_dt,
+                    modified_dt
+                } = boundaryRecord;
+
+                const existingCommunityBoundary = await findCommunityBoundaryByCommCode(comm_code);
+                if (existingCommunityBoundary) {
+                    console.log(`Updating ${comm_code}`);
+                    existingCommunityBoundary.name = name;
+                    existingCommunityBoundary.sector = sector;
+                    existingCommunityBoundary.boundary = multipolygon;
+                    existingCommunityBoundary.modifiedDate = modified_dt;
+                    await existingCommunityBoundary.save();
+                } else {
+                    console.log(`Creating ${comm_code} with name ${name}`)
+                    await createCommunityBoundary(
+                        comm_code,
+                        name,
+                        sector,
+                        multipolygon,
+                        created_dt,
+                        modified_dt
+                    )
+                }
                 totalRecords++;
             }
 

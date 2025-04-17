@@ -19,7 +19,7 @@ for (const community of communityBoundaries) {
         await existingCommunityBoundary.save()
     }
     else {
-        console.log('Creating', comm_code, 'of', name)
+        // console.log('Creating', comm_code, 'of', name)
         await createCommunityBoundary(comm_code, name, multipolygon)
     }
 }

@@ -5,7 +5,7 @@ const mongoose = await connectDb();
 
 // Schema
 const communityBoundarySchema = mongoose.Schema({
-    code: String,
+    commCode: String,
     name: String,
     sector: String,
     // multiPolygon: multiPolygon,
@@ -31,11 +31,21 @@ const CommunityBoundary = mongoose.model('communityBoundary', communityBoundaryS
 
 // Functions to expose the tables/collection
 // Create a new record.
-export async function createCommunityBoundary(commCode, name, boundary) {
+export async function createCommunityBoundary(
+        commCode,
+        name,
+        sector,
+        boundary,
+        createdDate,
+        modifiedDate
+    ) {
     const newCommunityBoundary = await CommunityBoundary.create({
-        commCode: commCode,
-        name: name,
-        boundary: boundary
+        commCode,
+        name,
+        sector,
+        boundary,
+        createdDate,
+        modifiedDate
     })
     return newCommunityBoundary
 }
