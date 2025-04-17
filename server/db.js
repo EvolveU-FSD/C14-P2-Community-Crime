@@ -10,12 +10,10 @@ let defaultURI = 'mongodb://localhost:27017/c14-P2-Crimes';
 const mongo_uri = process.env.MONGO_URI || defaultURI;
 
 if (mongo_uri === defaultURI) {
-    console.log(`NOTE, .env server is not working or not set up. Using default localhost Mongo connection.`);
+    console.log(`***NOTE***, .env server is not working or not set up. Using default localhost Mongo connection.`);
 } else {
     console.log(`Connected to dotenv server connection.`)
 }
-
-console.log(process.env.MONGO_URI)
 
 // TODO: remove the console log when all members are set up with Atlas.
 // console.log(mongo_uri);

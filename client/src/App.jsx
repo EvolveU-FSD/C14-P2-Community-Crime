@@ -2,7 +2,7 @@
 import { MapContainer, Polyline, TileLayer, useMap } from 'react-leaflet';
 import './App.css';
 import { useEffect, useState } from 'react';
-import { findAllCommunityBoundaries } from './api';
+import { findAllCommunityBoundaries, findCommunityByCommCode } from './api';
 // import { useEffect } from 'react';
 // import L from 'leaflet';
 // import 'leaflet.heat';
@@ -29,27 +29,93 @@ import { findAllCommunityBoundaries } from './api';
 function CommunityBoundaries() {
   const [communityBoundary, setCommunityBoundary] = useState([]);
 
+  // useEffect(() => {
+  //   findCommunityByCommCode
+  //   // console.log(`Getting community boundaries`);
+  //   findAllCommunityBoundaries().then((e) => {
+  //     setCommunityBoundary(e)
+  //     // console.log(`Found ${e.length} boundaries`);
+  //   })
+  // }, [])
+  const tempMultiPolygon = [
+    [
+      [51.037831, -114.0742562],
+      [51.0378312, -114.0715175],
+      [51.0378313, -114.0685169],
+      [51.0378314, -114.0660451],
+      [51.0378313, -114.0635768],
+      [51.0378313, -114.0611155],
+      [51.0370668, -114.0611716],
+      [51.037831, -114.0742562]
+    ]
+  ]
   useEffect(() => {
-    console.log(`Getting community boundaries`);
-    findAllCommunityBoundaries().then((e) => {
-      setCommunityBoundary(e)
-      console.log(`Found ${e.length} boundaries`);
-    })
-  }, [])
+    // setCommunityBoundary(findCommunityByCommCode('BLN'));
+    async function fetchCommunityData() {
+      try {
+        const community = await findCommunityByCommCode('BLN');
+        // Swap coordinates for Leaflet.
+        const communityWithSwappedCoords = {
+          ...community,
+          boundary: {
+            ...community.boundary,
+            coordinates: community.boundary.coordinates.map(polygon =>
+              polygon.map(ring =>
+                ring.map(coord => [coord[1], coord[0]]) // Swaps lng,lat to lat,lng
+              )
+            )
+          }
+        }
 
-  communityBoundary.map((community) => {
-    console.log(`${community.code}: with name ${community.name}`)
-  })
+        console.log(`community record is: ${JSON.stringify(communityWithSwappedCoords)}`);
+        setCommunityBoundary((prev) => [...prev, communityWithSwappedCoords]);
+        // console.log(`Boundaries so far are: ${communityBoundary}`);
+      } catch (error) {
+        console.error(`Error fetching community: ${error}`);
+      }
+    }
+
+    fetchCommunityData();
+    // findCommunityByCommCode('BLN')
+    //   .then(setCommunityBoundary)
+    //   .catch(error => console.error(`Error fetching community: ${error}`));
+    // console.log(`In Use Effect.`);
+    // console.log(`Boundaries so far are: ${communityBoundary}`);
+  }, [])
+  // console.log(communityBoundary);
+  // communityBoundary.map((community) => {
+    // console.log(`${community.code}: with name ${community.name}`)
+  // })
 
   const fillBlueOption = { color: 'blue' };
-  return communityBoundary.map((community) => {
-    <Polyline 
+  return communityBoundary.map((community) => (
+    // console.log(community.boundary)
+    // console.log(`Starting with record ${JSON.stringify(community.boundary.coordinates[0][0][0])}`);
+    // console.log(`Ending with record ${JSON.stringify(community.boundary.coordinates[0][0][751])}`);
+    <Polyline
       key={community._id}
       pathOptions={fillBlueOption}
-      positions={community.boundary.coordinates[0]} />
-  })
-}
+      // positions={tempMultiPolygon}
+      positions={community.boundary.coordinates[0][0]}
+    />
+  ));
 
+
+  // console.log(`communityBoundary length: ${communityBoundary.length}`);
+  // return communityBoundary.length > 0 ? (
+  //   <Polyline
+  //     pathOptions={fillBlueOption}
+  //     positions={communityBoundary[0].boundary.coordinates}
+  //     // positions={tempMultiPolygon}
+
+  //   />
+  // ) : null;
+  // return <Polyline
+  //   pathOptions={fillBlueOption}
+  //   positions={tempMultiPolygon}
+  
+}
+     
 function App () {
 
   // Sample heat data for Calgary (latitude, longitude, intensity)
@@ -95,6 +161,7 @@ function App () {
       />
 
       {/* <Polyline pathOptions={fillBlueOption} positions={tempMultiPolygon} /> */}
+      {console.log(tempMultiPolygon)}
       <CommunityBoundaries />
     </MapContainer>
   )

@@ -1,5 +1,5 @@
 import express from 'express';
-import { findAllCommunityBoundaries } from '../models/communityBoundary.js';
+import { findAllCommunityBoundaries, findCommunityBoundaryByCommCode } from '../models/communityBoundary.js';
 import { findAllCrimeRecords } from '../models/crimes.js';
 import { getCrimesByCategoryAndCommunity, getCrimesByCommunity, getCrimesByCommunityAndYear } from '../models/summaries.js';
 
@@ -22,6 +22,23 @@ router.get('/allCrimes', async (req, res) => {
         res.json(crimes);
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+});
+
+// Get a single community by the commCode.
+router.get('/community/:communityCommCode', async function (req, res) {
+    const commCode = req.params.communityCommCode
+    console.log(`In the route API with commCode: ${commCode}`)
+    try {
+        const communityRecord = await findCommunityBoundaryByCommCode(commCode);
+        console.log(`In the route API with communityRecord ${JSON.stringify(communityRecord)}`)
+        if (!communityRecord) { 
+            return res.status(404).json({ message: 'Community not found' });
+        }
+        res.send(communityRecord);
+    } catch (error) {
+        console.log(error);
+        res.sendStatus(500).json({ message: error.message });
     }
 });
 

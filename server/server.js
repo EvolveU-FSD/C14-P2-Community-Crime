@@ -1,7 +1,7 @@
 import express from 'express';
 import crimeRecordRoutes from './routes/crimeRecordRoutes.js';
 import communityBoundaryRoutes from './routes/communityBoundaryRoutes.js';
-import apiRoutes from './routes/api.js';
+import apiRoutes from './routes/apiRoutes.js';
 import { initializeCronJob, importCommunityBoundaryData } from './scheduled/daily.js';
 
 // Outlines the variables needed to run the server.

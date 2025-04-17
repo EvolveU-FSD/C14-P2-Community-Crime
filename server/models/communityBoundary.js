@@ -82,7 +82,9 @@ export async function communityFindOneAndUpdate(code, name, sector, multiPolygon
 }
 
 export async function findCommunityBoundaryByCommCode(commCode) {
+    console.log(`In communityBoundary model with var ${commCode}`)
     const communityBoundary = await CommunityBoundary.findOne({ commCode: commCode })
+    console.log(`In the communityBoundary with result: ${communityBoundary}`)
     return communityBoundary
 }
 
