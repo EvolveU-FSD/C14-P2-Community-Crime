@@ -42,9 +42,9 @@ function CommunityBoundaries() {
     // setCommunityBoundary(findCommunityByCommCode('BLN'));
     async function fetchCommunityData() {
       try {
-        const community = await findCommunityByCommCode('BLN');
+        const communities = await findAllCommunityBoundaries();
         // Swap coordinates for Leaflet.
-        const communityWithSwappedCoords = {
+        const communitiesWithSwappedCoords = communities.map(community => ({
           ...community,
           boundary: {
             ...community.boundary,
@@ -54,10 +54,9 @@ function CommunityBoundaries() {
               )
             )
           }
-        }
+        }))
 
-        console.log(`community record is: ${JSON.stringify(communityWithSwappedCoords)}`);
-        setCommunityBoundary((prev) => [...prev, communityWithSwappedCoords]);
+        setCommunityBoundary(communitiesWithSwappedCoords);
         // console.log(`Boundaries so far are: ${communityBoundary}`);
       } catch (error) {
         console.error(`Error fetching community: ${error}`);
