@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { findAllCommunityBoundaries } from "../models/communities.js";
+import { findAllCommunityBoundaries } from "../models/communityBoundary.js";
 
 const router = Router();
 

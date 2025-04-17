@@ -1,8 +1,8 @@
 import express from 'express';
 import crimeRecordRoutes from './routes/crimeRecordRoutes.js';
 import communityBoundaryRoutes from './routes/communityBoundaryRoutes.js';
-import apiRoutes from './routes/api.js';
-import { initializeCronJob } from './scheduled/daily.js';
+import apiRoutes from './routes/apiRoutes.js';
+import { initializeCronJob, importCommunityBoundaryData } from './scheduled/daily.js';
 
 // Outlines the variables needed to run the server.
 const app = express();
@@ -17,6 +17,7 @@ app.use('/allCommunities', communityBoundaryRoutes)
 app.use('/api', apiRoutes);
 
 // importCrimeData();
+// importCommunityBoundaryData();
 initializeCronJob();
 
 // Run the server. Write to console what port it selected.
