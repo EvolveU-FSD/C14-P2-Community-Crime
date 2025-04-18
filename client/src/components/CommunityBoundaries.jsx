@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Polygon } from 'react-leaflet';
 import { findAllCommunityBoundaries } from "../api";
+import chroma from "chroma-js";
 
 function CommunityBoundaries() {
     const [communityBoundary, setCommunityBoundary] = useState([]);
@@ -39,23 +40,32 @@ function CommunityBoundaries() {
     }, [])
 
     if (error) return <div>Error loading communities: {error}</div>
+    const minCrime = 0;
+    const maxCrime = 10000;
 
-    // Set a universal options variable for now. This will be adjusted once we get to filtering.
-    const polygonOptions = {
-        color: 'blue',
-        fillColor: 'lightblue',
-        fillOpacity: 0.4,
-        weight: 2
-    };
+    function getRandomColour(minCrime, maxCrime) {
+        return Math.floor(Math.random() * (maxCrime - minCrime) + minCrime);
+    }
 
-    return communityBoundary.map((community) => (
-        // Draw the Polygon per each community that is returned.
-        <Polygon
-            key={community._id}
-            pathOptions={polygonOptions}
-            positions={community.boundary.coordinates[0][0]}
-        />
-    ));
+    const scale = chroma.scale(['#00ff00', '#ffff00', '#ff0000'])
+        .domain([minCrime, maxCrime]);
+
+    return communityBoundary.map((community) => {
+        const crimeValue =  getRandomColour(minCrime, maxCrime);
+        const polygonOptions = {
+            color: scale(crimeValue ).hex(),
+            fillColor: scale(crimeValue ).hex(),
+            fillOpacity: 0.4,
+            weight: 2
+        }    // Draw the Polygon per each community that is returned.
+        return (
+            <Polygon
+                key={community._id}
+                pathOptions={polygonOptions}
+                positions={community.boundary.coordinates[0][0]}
+            />
+        );
+    });
 }
 
 export default CommunityBoundaries;
