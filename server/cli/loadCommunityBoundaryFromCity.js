@@ -35,7 +35,7 @@ for (const community of communityBoundaries) {
     if (existingCommunityBoundary) {
         console.log('Updating',comm_code)
         existingCommunityBoundary.name = name
-        existingCommunityBoundary.boundary = multipolygon
+        existingCommunityBoundary.boundary = { type: "MultiPolygon", coordinates: multipolygon }
         await existingCommunityBoundary.save()
     }
     else {
