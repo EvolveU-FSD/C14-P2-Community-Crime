@@ -99,6 +99,6 @@ export async function findAllCommunityBoundaries() {
 // Find a single record based on id.
 // TODO: consider searching by community instead of id.
 export async function findCommunityBoundaryById(id) {
-    const communityBoundary = await CommunityBoundary.findCommunityBoundaryById(id);
+    const communityBoundary = await CommunityBoundary.findById(id);
     return communityBoundary;
 }
