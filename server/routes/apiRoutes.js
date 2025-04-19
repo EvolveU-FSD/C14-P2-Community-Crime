@@ -38,7 +38,7 @@ router.get('/community/:communityCommCode', async function (req, res) {
         res.send(communityRecord);
     } catch (error) {
         console.log(error);
-        res.sendStatus(500).json({ message: error.message });
+        res.status(500).json({ message: error.message });
     }
 });
 
