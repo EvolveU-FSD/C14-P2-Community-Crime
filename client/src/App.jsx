@@ -1,5 +1,5 @@
 // App.jsx
-import { MapContainer, Polygon, TileLayer, useMap } from 'react-leaflet';
+import { MapContainer, Polygon, TileLayer} from 'react-leaflet';
 import './App.css';
 import CommunityBoundaries from './components/CommunityBoundaries'
 // import { useEffect } from 'react';
