@@ -37,8 +37,6 @@ export function CrimeFilterMultiSelect() {
 
     // Run the function outlined above.
     fetchCrimeTypeList();
-
-    console.log(crimeTypeList);
   }, [])
   
   const handleChange = (selected) => {

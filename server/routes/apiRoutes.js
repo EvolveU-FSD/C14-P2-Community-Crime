@@ -1,5 +1,5 @@
 import express from 'express';
-import { findAllCommunityBoundaries, findCommunityBoundaryByCommCode } from '../models/communityBoundary.js';
+import { findAllCommunityBoundaries, findCommunityBoundaryByCommCode, getCommunityBoundaryList } from '../models/communityBoundary.js';
 import { findAllCrimeRecords, getCrimeTypeList } from '../models/crimes.js';
 import { getCrimesByCategoryAndCommunity, getCrimesByCommunity, getCrimesByCommunityAndYear } from '../models/summaries.js';
 
@@ -38,6 +38,16 @@ router.get('/community/:communityCommCode', async function (req, res) {
         res.send(communityRecord);
     } catch (error) {
         console.log(error);
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Get the Community Boundary list for the multiselect.
+router.get('/communityBoundaryList', async (req, res) => {
+    try {
+        const communityBoundaryList = await getCommunityBoundaryList();
+        res.json(communityBoundaryList);
+    } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });

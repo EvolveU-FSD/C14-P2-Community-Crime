@@ -1,23 +1,36 @@
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const animatedComponents = makeAnimated();
-const communityTempOptions = [
-  { value: 'comm01', label: 'comm1' },
-  { value: 'comm02', label: 'comm2' },
-  { value: 'comm03', label: 'comm3' },
-  { value: 'comm04', label: 'comm4' },
-  { value: 'comm05', label: 'comm5' },
-  { value: 'comm06', label: 'comm6' },
-];
-const defaultTempCommunities = [
-  { value: 'comm01', label: 'comm1' },
-  { value: 'comm02', label: 'comm2' },
-]
 
 export function CommunityFilterMultiSelect() {
-  const [selectedOptions, setSelectedOptions] = useState(defaultTempCommunities);
+  const [communityBoundaryList, setCommunityBoundaryList] = useState({});
+  const [selectedOptions, setSelectedOptions] = useState({});
+
+  useEffect(() => {
+    // Put the fetch in a function.
+    async function fetchCommunityBoundaryList() {
+        try {
+            const communityBoundaryResponse = await fetch('/api/communityBoundaryList');
+
+            if (!communityBoundaryResponse.ok) {
+                throw new Error('Community Boundary list API call error');
+            }
+
+            const communityBoundaryListData = await communityBoundaryResponse.json();
+
+            // Since we have comm code, this has been formatted into an object in the base query.
+            // No need to format it like was needed for the Crimes list.
+            setCommunityBoundaryList(communityBoundaryListData);
+        } catch (error) {
+            console.error(`Error fetching community boundary list: ${error}`);
+        }
+    }
+
+    // Run the function built above.
+    fetchCommunityBoundaryList();
+  }, [])
 
   const handleChange = (selected) => {
     setSelectedOptions(selected);
@@ -30,11 +43,10 @@ export function CommunityFilterMultiSelect() {
       <Select
         closeMenuOnSelect={false}
         components={animatedComponents}
-        defaultValue={defaultTempCommunities}
         onChange={handleChange}
         isMulti
-        placeholder="Filter by crime"
-        options={communityTempOptions}
+        placeholder="Filter by community"
+        options={communityBoundaryList}
       />
     </div>
   )
