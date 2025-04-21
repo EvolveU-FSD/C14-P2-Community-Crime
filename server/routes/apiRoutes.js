@@ -62,6 +62,16 @@ router.get('/crimeSummary', async (req, res) => {
     }
 });
 
+router.post('/crimeSummary', async (req, res) => {
+    try {
+        const filters = req.body;
+        const data = await getCrimesByCommunity(filters);
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+})
+
 // If giving a single community, return summarized crime data, broken down by crime type.
 router.get('/crimeSummary/:community', async (req, res) => {
     try {
