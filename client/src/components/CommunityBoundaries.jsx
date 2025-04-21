@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Polygon } from 'react-leaflet';
+import { Polygon, Popup } from 'react-leaflet';
 import chroma from "chroma-js";
 
 function CommunityBoundaries() {
@@ -85,7 +85,18 @@ function CommunityBoundaries() {
                 pathOptions={polygonOptions}
                 // The position to draw is nested deep in the coordinates field so needs two layers of array reference.
                 positions={community.boundary.coordinates[0][0]}
-            />
+                // One option is to make it a click to display the information.
+                // eventHandlers={{
+                //     click: () => {
+                //         console.log(`${community._id}: total crimes: ${community.totalCrimes}`);
+                //     }
+                // }}
+            >
+                <Popup>
+                    Community: {community._id} <br />
+                    Total Crimes: {community.totalCrimes}
+                </Popup>
+            </Polygon>
         );
     });
 }
