@@ -5,11 +5,11 @@ const mongoose = await connectDb();
 
 // Schema
 const communityBoundarySchema = mongoose.Schema({
-    code: String,
+    commCode: String,
     name: String,
     sector: String,
     // multiPolygon: multiPolygon,
-    multiPolygon: {
+    boundary: {
         type: {
             type: String,
             enum: ['MultiPolygon'],
@@ -24,11 +24,31 @@ const communityBoundarySchema = mongoose.Schema({
     modifiedDate: Date
 })
 
+communityBoundarySchema.index({ boundary: '2dsphere' });
+
 // Models
-const CommunityBoundaryRecord = mongoose.model('communityBoundary', communityBoundarySchema, 'communityBoundaries');
+const CommunityBoundary = mongoose.model('communityBoundary', communityBoundarySchema, 'communityBoundaries');
 
 // Functions to expose the tables/collection
 // Create a new record.
+export async function createCommunityBoundary(
+        commCode,
+        name,
+        sector,
+        boundary,
+        createdDate,
+        modifiedDate
+    ) {
+    const newCommunityBoundary = await CommunityBoundary.create({
+        commCode,
+        name,
+        sector,
+        boundary,
+        createdDate,
+        modifiedDate
+    })
+    return newCommunityBoundary
+}
 
 // Find one and update.
 export async function communityFindOneAndUpdate(code, name, sector, multiPolygon, createdDate, modifiedDate) {
@@ -41,7 +61,10 @@ export async function communityFindOneAndUpdate(code, name, sector, multiPolygon
         }
 
         const update = {
-            multiPolygon: multiPolygon,
+            boundary: {
+                type: 'MultiPolygon',
+                coordinates: multiPolygon
+            },
             modifiedDate: modifiedDate
         }
 
@@ -50,7 +73,7 @@ export async function communityFindOneAndUpdate(code, name, sector, multiPolygon
             new: true
         }
 
-        const newBoundary = await CommunityBoundaryRecord.findOneAndUpdate(filter, update, options);
+        const newBoundary = await CommunityBoundary.findOneAndUpdate(filter, update, options);
         return newBoundary;
     } catch (error) {
         console.error(`Error in findOneAndUpdate: ${error}`);
@@ -58,17 +81,24 @@ export async function communityFindOneAndUpdate(code, name, sector, multiPolygon
     }
 }
 
+export async function findCommunityBoundaryByCommCode(commCode) {
+    console.log(`In communityBoundary model with var ${commCode}`)
+    const communityBoundary = await CommunityBoundary.findOne({ commCode: commCode })
+    console.log(`In the communityBoundary with result: ${communityBoundary}`)
+    return communityBoundary
+}
+
 // Delete a record (not called from the app).
 
 // Export all records.
 export async function findAllCommunityBoundaries() {
-    const communityBoundaries = await CommunityBoundaryRecord.find({});
+    const communityBoundaries = await CommunityBoundary.find({});
     return communityBoundaries;
 }
 
 // Find a single record based on id.
 // TODO: consider searching by community instead of id.
 export async function findCommunityBoundaryById(id) {
-    const communityBoundary = await CommunityBoundaryRecord.findCommunityBoundaryById(id);
+    const communityBoundary = await CommunityBoundary.findById(id);
     return communityBoundary;
 }

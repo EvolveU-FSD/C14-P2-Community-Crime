@@ -14,13 +14,59 @@ export async function getCrimesByCommunity() {
                 $group: {
                     _id: "$community",
                     totalCrimes: { $sum: "$crimeCount" },
-                    crimesByCategory: {
-                        // In addition to the original grouping, a second grouping exists to also split by crime.
-                        $push: {
-                            category: "$category",
-                            count: "$crimeCount"
+                    // crimesByCategory: {
+                    //     // In addition to the original grouping, a second grouping exists to also split by crime.
+                    //     $push: {
+                    //         category: "$category",
+                    //         count: "$crimeCount"
+                    //     }
+                    // }
+                }
+            },
+            {
+                // Add a lookup to join with community boundaries
+                $lookup: {
+                    from: "communityBoundaries",
+                    let: { communityName: "$_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: ["$name", "$$communityName"]
+                                }
+                            }
+                        },
+                        {
+                            $project: {
+                                _id: 1,
+                                name: 1,
+                                sector: 1,
+                                commCode: 1,
+                                boundary: 1
+                            }
                         }
-                    }
+                    ],
+                    as: "communityInfo"
+                }
+            },
+            {
+                // Unwind the array from the lookup.
+                $unwind: "$communityInfo"
+                // $unwind: {
+                //     path: "$communityInfo",
+                //     preserveNullAndEmptyArrays: true
+                // }
+            },
+            {
+                // Shape the output.
+                $project: {
+                    _id: 1,
+                    totalCrimes: 1,
+                    // crimesByCategory: 1,
+                    // communityName: "$communityInfo.name",
+                    sector: "$communityInfo.sector",
+                    commCode: "$communityInfo.commCode",
+                    boundary: "$communityInfo.boundary"
                 }
             },
             {
