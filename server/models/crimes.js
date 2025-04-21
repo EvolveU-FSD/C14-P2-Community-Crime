@@ -88,3 +88,14 @@ export async function findCrimeById(id) {
     const crime = await CrimeRecord.findCrimeById(id);
     return crime;
 }
+
+// Export just the distinct crime types.
+export async function getCrimeTypeList() {
+    try {
+        const crimeTypeList = await CrimeRecord.distinct('category');
+        return crimeTypeList;
+    } catch (error) {
+        console.error(`Error in getCrimeTypeList: ${error}`);
+        throw error;
+    }
+}
