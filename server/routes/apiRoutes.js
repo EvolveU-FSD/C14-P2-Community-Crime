@@ -1,6 +1,6 @@
 import express from 'express';
 import { findAllCommunityBoundaries, findCommunityBoundaryByCommCode } from '../models/communityBoundary.js';
-import { findAllCrimeRecords } from '../models/crimes.js';
+import { findAllCrimeRecords, getCrimeTypeList } from '../models/crimes.js';
 import { getCrimesByCategoryAndCommunity, getCrimesByCommunity, getCrimesByCommunityAndYear } from '../models/summaries.js';
 
 const router = express.Router();
@@ -67,6 +67,16 @@ router.get('/crimeSummaryByYear', async (req, res) => {
     try {
         const summary = await getCrimesByCommunityAndYear();
         res.json(summary);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Get the Crime Type list for the multiselect.
+router.get('/crimeTypeList', async (req, res) => {
+    try {
+        const crimeTypeList = await getCrimeTypeList();
+        res.json(crimeTypeList);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
