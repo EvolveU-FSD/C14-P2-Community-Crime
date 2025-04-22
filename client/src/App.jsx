@@ -27,6 +27,7 @@ import CommunityBoundaries from './components/CommunityBoundaries'
 //   return null;
 // };
 
+
 function App () {
   return (
     <>
@@ -41,12 +42,12 @@ function App () {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-      <CommunityBoundaries />
+
+        {/* Add the community boundaries drawing. */}
+        <CommunityBoundaries />
       </MapContainer>
     </>
   )
 };
 
 export default App;
-
-
