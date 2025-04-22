@@ -4,8 +4,8 @@ const FilterContext = createContext();
 
 export function FilterProvider({ children }) {
     const [filters, setFilters] = useState({
-        communitiesList: [],
-        crimeCategoriesList: []
+        communitiesListFilter: [],
+        crimeListFilter: []
     });
 
     return (

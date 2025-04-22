@@ -36,10 +36,8 @@ export function CommunityFilterMultiSelect() {
   const handleChange = (selectedOptions) => {
     setFilters(prev => ({
       ...prev,
-      communitiesList: selectedOptions || []
+      communitiesListFilter: selectedOptions || []
     }));
-    // Logged the currently selected options to get VS Code to not complain about it not being used.
-    console.log(filters.communitiesList);
   };
 
   return (

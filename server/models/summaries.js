@@ -7,15 +7,15 @@ const mongoose = await connectDb();
 // This function will group all of the results first by community, summarize them,
 // then will summarize them by crime.
 export async function getCrimesByCommunity(filters) {
-    const { communitiesList, crimeCategoriesList } = filters;
+    const { communitiesListFilter, crimeListFilter } = filters;
 
     const matchCondition = {};
-    if (communitiesList?.length > 0) {
-        matchCondition.community = { $in: communitiesList.map(c => c.value)};
+    if (communitiesListFilter?.length > 0) {
+        matchCondition.community = { $in: communitiesListFilter.map(c => c.label)};
     }
 
-    if (crimeCategoriesList?.length > 0) {
-        matchCondition.category = {$in: crimeCategoriesList.map(c => c.value)};
+    if (crimeListFilter?.length > 0) {
+        matchCondition.category = {$in: crimeListFilter.map(c => c.value)};
     }
 
     try {

@@ -28,10 +28,8 @@ router.get('/allCrimes', async (req, res) => {
 // Get a single community by the commCode.
 router.get('/community/:communityCommCode', async function (req, res) {
     const commCode = req.params.communityCommCode
-    console.log(`In the route API with commCode: ${commCode}`)
     try {
         const communityRecord = await findCommunityBoundaryByCommCode(commCode);
-        console.log(`In the route API with communityRecord ${JSON.stringify(communityRecord)}`)
         if (!communityRecord) { 
             return res.status(404).json({ message: 'Community not found' });
         }

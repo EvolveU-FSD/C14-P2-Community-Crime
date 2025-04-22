@@ -7,7 +7,6 @@ const animatedComponents = makeAnimated();
 
 export function CrimeFilterMultiSelect() {
     const [crimeTypeList, setCrimeTypeList] = useState({});
-  const [selectedOptions, setSelectedOptions] = useState({});
   const { filters, setFilters } = useFilters();
 
   // When the page loads, get the list of crime types.
@@ -44,10 +43,8 @@ export function CrimeFilterMultiSelect() {
     // setSelectedOptions(selectedOptions);
     setFilters(prev => ({
         ...prev,
-        crimeTypeList: selectedOptions || []
+        crimeListFilter: selectedOptions || []
     }));
-    // Logged the currently selected options to get VS Code to not complain about it not being used.
-    console.log(filters.crimeTypeList);
   };
 
   return (
