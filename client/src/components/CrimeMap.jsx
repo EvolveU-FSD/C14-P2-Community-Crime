@@ -1,20 +1,11 @@
-import { MapContainer, TileLayer} from 'react-leaflet';
-import CommunityBoundaries from './components/CommunityBoundaries';
-import { CommunityFilterMultiSelect } from './components/CommunityFilterMultiSelect';
-import { CrimeFilterMultiSelect } from './components/CrimeFilterMultiSelect';
-import './App.css';
-//I dont know if this is all we need for imports
+import React from 'react';
+import { MapContainer, TileLayer } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import CommunityBoundaries from "./client/src/components/CommunityBoundaries.jsx";
 
-
-
-
-function CrimeMap () { //why does nothing work here
+const CrimeMap = () => {
   return (
-    <>
-      <CommunityFilterMultiSelect />
-      <CrimeFilterMultiSelect />
-      
-      <MapContainer
+    <MapContainer
         center={[51.0447, -114.0719]} // Calgary center
         zoom={12}
         className="leaflet-container"
@@ -27,9 +18,7 @@ function CrimeMap () { //why does nothing work here
         {/* Add the community boundaries drawing. */}
         <CommunityBoundaries />
       </MapContainer>
-    </>
-  )
+  );
 };
 
-
-
+export default CrimeMap;

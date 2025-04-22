@@ -3,13 +3,20 @@ import { MapContainer, Polygon, TileLayer} from 'react-leaflet';
 import './App.css';
 import { CrimeFilterMultiSelect } from './components/CrimeFilterMultiSelect';
 import { CommunityFilterMultiSelect } from './components/CommunityFilterMultiSelect';
-import CommunityBoundaries from './components/CommunityBoundaries';
-import { CrimeMap } from './components/CrimeMap';
-// import { useEffect } from 'react';
-// import L from 'leaflet';
-// import 'leaflet.heat';
-// import 'leaflet/dist/leaflet.css';
+import React from 'react';
+import CrimeMap from './components/CrimeMap'; 
 
+
+function App() {
+  return (
+    <div>
+      <h1>Community Crime Map</h1>
+      <CrimeMap />
+      <CommunityFilterMultiSelect />
+      <CrimeFilterMultiSelect />
+    </div>
+  );
+}
 // const HeatmapLayer = ({ data }) => {
 //   const map = useMap();
 
@@ -29,14 +36,5 @@ import { CrimeMap } from './components/CrimeMap';
 // };
 
 
-     
-function App () {
-  return (
-    <>
-      <CommunityFilterMultiSelect />
-      <CrimeFilterMultiSelect /> </>
-  )
-}
 
-      
 export default App;
