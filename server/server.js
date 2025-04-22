@@ -6,6 +6,8 @@ import { initializeCronJob, importCommunityBoundaryData } from './scheduled/dail
 
 // Outlines the variables needed to run the server.
 const app = express();
+// Add middleware to process the body.
+app.use(express.json());
 // Get a port from the environment, or default to 3000 if one can't be retrieved.
 const PORT = process.env.PORT || 3000;
 

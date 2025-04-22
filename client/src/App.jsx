@@ -1,4 +1,5 @@
 // App.jsx
+import { FilterProvider } from './context/FilterContext';
 import { MapContainer, Polygon, TileLayer} from 'react-leaflet';
 import './App.css';
 import { CrimeFilterMultiSelect } from './components/CrimeFilterMultiSelect';
@@ -31,7 +32,7 @@ import CommunityBoundaries from './components/CommunityBoundaries'
      
 function App () {
   return (
-    <>
+    <FilterProvider>
       <CommunityFilterMultiSelect />
       <CrimeFilterMultiSelect />
       <MapContainer
@@ -47,7 +48,7 @@ function App () {
         {/* Add the community boundaries drawing. */}
         <CommunityBoundaries />
       </MapContainer>
-    </>
+    </FilterProvider>
   )
 };
 
