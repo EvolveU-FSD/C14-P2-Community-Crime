@@ -113,3 +113,18 @@ export async function findCommunityBoundaryById(id) {
         throw error;
     }
 }
+
+// Export just the distinct community names with comm code.
+export async function getCommunityBoundaryList() {
+    try {
+        const communityBoundaryListFull = await CommunityBoundary.find({});
+        const communityBoundaryList = communityBoundaryListFull.map(community => ({
+            value: community.commCode,
+            label: community.name
+        }));
+        return communityBoundaryList;
+    } catch (error) {
+        console.error(`Error getting community boundary list: ${error}`);
+        throw error;
+    }
+}
