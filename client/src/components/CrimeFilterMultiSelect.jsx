@@ -1,5 +1,6 @@
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
+import { useFilters } from '../context/FilterContext';
 import { useEffect, useState } from 'react';
 
 const animatedComponents = makeAnimated();
@@ -7,6 +8,7 @@ const animatedComponents = makeAnimated();
 export function CrimeFilterMultiSelect() {
     const [crimeTypeList, setCrimeTypeList] = useState({});
   const [selectedOptions, setSelectedOptions] = useState({});
+  const { filters, setFilters } = useFilters();
 
   // When the page loads, get the list of crime types.
   useEffect(() => {
@@ -20,7 +22,6 @@ export function CrimeFilterMultiSelect() {
             }
 
             const crimeTypeListData = await crimeTypeResponse.json();
-            // console.log(crimeTypeListData);
 
             // The options format requires an array of objects.
             // TODO: Create new lookup collections that give a proper ID for the label to avoid whitespace.
@@ -39,10 +40,14 @@ export function CrimeFilterMultiSelect() {
     fetchCrimeTypeList();
   }, [])
   
-  const handleChange = (selected) => {
-    setSelectedOptions(selected);
+  const handleChange = (selectedOptions) => {
+    // setSelectedOptions(selectedOptions);
+    setFilters(prev => ({
+        ...prev,
+        crimeTypeList: selectedOptions || []
+    }));
     // Logged the currently selected options to get VS Code to not complain about it not being used.
-    console.log(selectedOptions);
+    console.log(filters.crimeTypeList);
   };
 
   return (
