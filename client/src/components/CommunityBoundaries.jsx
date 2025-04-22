@@ -37,7 +37,6 @@ function CommunityBoundaries() {
         // Create a sub function to complete async/await processes.
         async function fetchFilteredCommunityData() {
             try {
-                console.log('Sending filters to API: ', filters)
                 // Add all community records to a record.
                 // TODO: Determine why some communities aren't being matched properly, ie Scarboro/Sunalta.
                 // TODO: Extract the crimeSummary call into the front end API.
@@ -46,8 +45,6 @@ function CommunityBoundaries() {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(filters)
                 }).then(res => res.json());
-
-                console.log('Received crime summary: ', crimeSummary)
 
                 // Because crimeSummary is sorted by total crimes with the biggest one first,
                 // we can set the maxCrimes amount by referencing the first record.
