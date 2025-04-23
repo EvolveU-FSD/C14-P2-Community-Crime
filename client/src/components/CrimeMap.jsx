@@ -3,7 +3,7 @@ import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import CommunityBoundaries from "./CommunityBoundaries";
 
-function CrimeMap () {
+export function CrimeMap () {
   return (
     <MapContainer
         center={[51.0447, -114.0719]} // Calgary center
@@ -20,5 +20,3 @@ function CrimeMap () {
       </MapContainer>
   );
 };
-
-export default CrimeMap;
