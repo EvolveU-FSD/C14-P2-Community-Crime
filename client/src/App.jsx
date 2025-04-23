@@ -5,7 +5,7 @@ import './App.css';
 import { CrimeFilterMultiSelect } from './components/CrimeFilterMultiSelect';
 import { CommunityFilterMultiSelect } from './components/CommunityFilterMultiSelect';
 import React from 'react';
-import CrimeMap from './components/CrimeMap'; 
+import { CrimeMap } from './components/CrimeMap'; 
 
 
 function App() {
