@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useFilters } from "../context/FilterContext";
 import { Polygon, Popup } from 'react-leaflet';
 import chroma from "chroma-js";
-import { BoundsControl } from "../App";
+import { BoundsControl } from "./BoundsControl";
 
 function CommunityBoundaries() {
     const { filters } = useFilters();
