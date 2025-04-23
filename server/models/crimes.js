@@ -1,4 +1,5 @@
 // Create a mongoose connection from the db file.
+import { connectDb } from '../db.js';
 const mongoose = await connectDb();
 
 // Schema
