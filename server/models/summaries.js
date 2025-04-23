@@ -6,9 +6,24 @@ const mongoose = await connectDb();
 // We want to by default display all our cimes as a total on the main map.
 // This function will group all of the results first by community, summarize them,
 // then will summarize them by crime.
-export async function getCrimesByCommunity() {
+export async function getCrimesByCommunity(filters) {
+    const { communitiesListFilter, crimeListFilter } = filters;
+
+    const matchCondition = {};
+    if (communitiesListFilter?.length > 0) {
+        matchCondition.community = { $in: communitiesListFilter.map(c => c.label)};
+    }
+
+    if (crimeListFilter?.length > 0) {
+        matchCondition.category = {$in: crimeListFilter.map(c => c.value)};
+    }
+
     try {
         const crimeSummary = await CrimeRecord.aggregate([
+            // Only add the match condition if filter conditions exist.
+            ...(Object.keys(matchCondition).length > 0 ? [{
+                $match: matchCondition
+            }] : []),
             {
                 // Within Mongoose create a group variable. The key is the community field and will then crime by that value.
                 $group: {

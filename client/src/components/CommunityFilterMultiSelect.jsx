@@ -1,15 +1,16 @@
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
+import { useFilters } from '../context/FilterContext';
 import { useEffect, useState } from 'react';
 
 const animatedComponents = makeAnimated();
 
 export function CommunityFilterMultiSelect() {
   const [communityBoundaryList, setCommunityBoundaryList] = useState({});
-  const [selectedOptions, setSelectedOptions] = useState({});
+  const { filters, setFilters } = useFilters();
 
   useEffect(() => {
-    // Put the fetch in a function.
+    // Put the fetch in a function to get the master list of all community names.
     async function fetchCommunityBoundaryList() {
         try {
             const communityBoundaryResponse = await fetch('/api/communityBoundaryList');
@@ -32,10 +33,11 @@ export function CommunityFilterMultiSelect() {
     fetchCommunityBoundaryList();
   }, [])
 
-  const handleChange = (selected) => {
-    setSelectedOptions(selected);
-    // Logged the currently selected options to get VS Code to not complain about it not being used.
-    console.log(selectedOptions);
+  const handleChange = (selectedOptions) => {
+    setFilters(prev => ({
+      ...prev,
+      communitiesListFilter: selectedOptions || []
+    }));
   };
 
   return (
