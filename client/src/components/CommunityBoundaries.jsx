@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { useFilters } from "../context/FilterContext";
 import { Polygon, Popup } from 'react-leaflet';
 import chroma from "chroma-js";
 
 function CommunityBoundaries() {
+    const { filters } = useFilters();
     const [communityBoundary, setCommunityBoundary] = useState([]);
     const [maxCrime, setMaxCrime] = useState(0);
     const [error, setError] = useState(null);
@@ -30,14 +32,19 @@ function CommunityBoundaries() {
     }
 
     // When the page loads, this will run once.
+    // TODO: Split the useEffect to load once per filter type change (ie, once on filter.communities and once on filter.crimeCategory)
     useEffect(() => {
         // Create a sub function to complete async/await processes.
-        async function fetchCommunityData() {
+        async function fetchFilteredCommunityData() {
             try {
                 // Add all community records to a record.
                 // TODO: Determine why some communities aren't being matched properly, ie Scarboro/Sunalta.
                 // TODO: Extract the crimeSummary call into the front end API.
-                const crimeSummary = await fetch('/api/crimeSummary').then(res => res.json());
+                const crimeSummary = await fetch('/api/crimeSummary', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(filters)
+                }).then(res => res.json());
 
                 // Because crimeSummary is sorted by total crimes with the biggest one first,
                 // we can set the maxCrimes amount by referencing the first record.
@@ -59,8 +66,8 @@ function CommunityBoundaries() {
         }
 
         // Run the function outlined above.
-        fetchCommunityData();
-    }, [])
+        fetchFilteredCommunityData();
+    }, [filters])
 
     if (error) return <div>Error loading communities: {error}</div>
 

@@ -28,10 +28,8 @@ router.get('/allCrimes', async (req, res) => {
 // Get a single community by the commCode.
 router.get('/community/:communityCommCode', async function (req, res) {
     const commCode = req.params.communityCommCode
-    console.log(`In the route API with commCode: ${commCode}`)
     try {
         const communityRecord = await findCommunityBoundaryByCommCode(commCode);
-        console.log(`In the route API with communityRecord ${JSON.stringify(communityRecord)}`)
         if (!communityRecord) { 
             return res.status(404).json({ message: 'Community not found' });
         }
@@ -61,6 +59,16 @@ router.get('/crimeSummary', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+
+router.post('/crimeSummary', async (req, res) => {
+    try {
+        const filters = req.body;
+        const data = await getCrimesByCommunity(filters);
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+})
 
 // If giving a single community, return summarized crime data, broken down by crime type.
 router.get('/crimeSummary/:community', async (req, res) => {
