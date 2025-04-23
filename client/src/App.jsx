@@ -4,51 +4,18 @@ import { MapContainer, TileLayer } from 'react-leaflet';
 import './App.css';
 import { CrimeFilterMultiSelect } from './components/CrimeFilterMultiSelect';
 import { CommunityFilterMultiSelect } from './components/CommunityFilterMultiSelect';
-import CommunityBoundaries from './components/CommunityBoundaries'
-// import { useEffect } from 'react';
-// import L from 'leaflet';
-// import 'leaflet.heat';
-// import 'leaflet/dist/leaflet.css';
-
-// const HeatmapLayer = ({ data }) => {
-//   const map = useMap();
-
-//   useEffect(() => {
-//     const heat = L.heatLayer(data, {
-//       radius: 30,
-//       blur: 20,
-//       maxZoom: 17,
-//     }).addTo(map);
-
-//     return () => {
-//       map.removeLayer(heat);
-//     };
-//   }, [data, map]);
-
-//   return null;
-// };
+import React from 'react';
+import { CrimeMap } from './components/CrimeMap'; 
 
 
-function App () {
+function App() {
   return (
     <FilterProvider>
+      <CrimeMap />
       <CommunityFilterMultiSelect />
       <CrimeFilterMultiSelect />
-      <MapContainer
-        center={[51.0447, -114.0719]} // Calgary center
-        zoom={12}
-        className="leaflet-container"
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-
-        {/* Add the community boundaries drawing. */}
-        <CommunityBoundaries />
-      </MapContainer>
     </FilterProvider>
-  )
-};
+  );
+}
 
 export default App;
