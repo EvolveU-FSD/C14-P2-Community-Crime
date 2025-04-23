@@ -9,12 +9,11 @@ import CrimeMap from './components/CrimeMap';
 
 function App() {
   return (
-    <div>
-      <h1>Community Crime Map</h1>
+    <>
       <CrimeMap />
       <CommunityFilterMultiSelect />
       <CrimeFilterMultiSelect />
-    </div>
+    </>
   );
 }
 // const HeatmapLayer = ({ data }) => {

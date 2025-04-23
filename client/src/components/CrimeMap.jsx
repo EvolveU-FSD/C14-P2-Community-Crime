@@ -1,7 +1,7 @@
 import React from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import CommunityBoundaries from "./client/src/components/CommunityBoundaries.jsx";
+import CommunityBoundaries from "./CommunityBoundaries";
 
 const CrimeMap = () => {
   return (
