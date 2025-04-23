@@ -1,36 +1,41 @@
-// App.jsx
-import { FilterProvider } from './context/FilterContext';
-import { MapContainer, Polygon, TileLayer} from 'react-leaflet';
+import { FilterProvider, useFilters } from './context/FilterContext';
+import { MapContainer, TileLayer, FeatureGroup, useMap} from 'react-leaflet';
 import './App.css';
 import { CrimeFilterMultiSelect } from './components/CrimeFilterMultiSelect';
 import { CommunityFilterMultiSelect } from './components/CommunityFilterMultiSelect';
 import CommunityBoundaries from './components/CommunityBoundaries'
-// import { useEffect } from 'react';
-// import L from 'leaflet';
-// import 'leaflet.heat';
-// import 'leaflet/dist/leaflet.css';
+import { useEffect, useRef } from 'react';
 
-// const HeatmapLayer = ({ data }) => {
-//   const map = useMap();
+// Create a new component to handle bounds updates
+export function BoundsUpdater({ group }) {
+  const map = useMap();
+  const { filters } = useFilters();
 
-//   useEffect(() => {
-//     const heat = L.heatLayer(data, {
-//       radius: 30,
-//       blur: 20,
-//       maxZoom: 17,
-//     }).addTo(map);
+  useEffect(() => {
+    if (group.current) {
+      const bounds = group.current.getBounds();
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [50, 50] });
+      }
+    }
+  }, [map, group, filters]);
 
-//     return () => {
-//       map.removeLayer(heat);
-//     };
-//   }, [data, map]);
+  return null;
+}
 
-//   return null;
-// };
+export function BoundsControl({ isLoading }) {
+  const featureGroupRef = useRef(null);
 
-
+  return (
+    <FeatureGroup ref={featureGroupRef}>
+      <BoundsUpdater group={featureGroupRef} isLoading={isLoading} />
+    </FeatureGroup>
+  );
+}
      
 function App () {
+  const featureGroupRef = useRef(null);
+
   return (
     <FilterProvider>
       <CommunityFilterMultiSelect />
@@ -46,7 +51,10 @@ function App () {
         />
 
         {/* Add the community boundaries drawing. */}
-        <CommunityBoundaries />
+        <FeatureGroup ref={featureGroupRef}>
+          <CommunityBoundaries />
+        </FeatureGroup>
+        <BoundsUpdater group={featureGroupRef} />
       </MapContainer>
     </FilterProvider>
   )
