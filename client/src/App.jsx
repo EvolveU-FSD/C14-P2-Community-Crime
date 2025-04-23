@@ -1,6 +1,6 @@
 // App.jsx
 import { FilterProvider } from './context/FilterContext';
-import { MapContainer, Polygon, TileLayer} from 'react-leaflet';
+import { MapContainer, TileLayer } from 'react-leaflet';
 import './App.css';
 import { CrimeFilterMultiSelect } from './components/CrimeFilterMultiSelect';
 import { CommunityFilterMultiSelect } from './components/CommunityFilterMultiSelect';
@@ -29,7 +29,6 @@ import CommunityBoundaries from './components/CommunityBoundaries'
 // };
 
 
-     
 function App () {
   return (
     <FilterProvider>
