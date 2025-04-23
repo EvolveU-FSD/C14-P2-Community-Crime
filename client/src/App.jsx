@@ -32,7 +32,7 @@ export function BoundsControl({ isLoading }) {
     </FeatureGroup>
   );
 }
-     
+
 function App () {
   const featureGroupRef = useRef(null);
 
