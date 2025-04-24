@@ -81,7 +81,10 @@ export default function CommunityBoundaries() {
         .domain([0, maxCrime]);
 
     return (
-        <>
+        <BoundsControl
+            isLoading={isLoading}
+            hasBoundaries={communityBoundary.length > 0}
+        >
             {communityBoundary.map((community) => {
                 // Set the polygon Options. The colour is using the Chroma dependency and calculates based on
                 // total crimes for a community compared to the community with the most crimes (beltline).
@@ -107,9 +110,6 @@ export default function CommunityBoundaries() {
                     </Polygon>
                 );
             })};
-            <BoundsControl isLoading={isLoading} 
-                hasBoundaries={communityBoundary.length > 0}
-            />
-        </>
+        </BoundsControl>
     )
 }

@@ -18,10 +18,7 @@ export default function CrimeMap () {
         />
 
         {/* Add the community boundaries drawing. */}
-        <FeatureGroup ref={featureGroupRef}>
-          <CommunityBoundaries />
-        </FeatureGroup>
-        <BoundsUpdater group={featureGroupRef} />
+        <CommunityBoundaries />
       </MapContainer>
   );
 };
