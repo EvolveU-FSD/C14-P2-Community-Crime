@@ -4,7 +4,7 @@ import { Polygon, Popup } from 'react-leaflet';
 import chroma from "chroma-js";
 import { BoundsControl } from "./BoundsControl";
 
-function CommunityBoundaries() {
+export default function CommunityBoundaries() {
     const { filters } = useFilters();
     const [communityBoundary, setCommunityBoundary] = useState([]);
     const [maxCrime, setMaxCrime] = useState(0);
@@ -113,5 +113,3 @@ function CommunityBoundaries() {
         </>
     )
 }
-
-export default CommunityBoundaries;
