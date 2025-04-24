@@ -2,9 +2,9 @@ import React, { useRef } from 'react';
 import { FeatureGroup, MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import CommunityBoundaries from "./CommunityBoundaries";
-import { BoundsUpdater } from './BoundsUpdater';
+import BoundsUpdater from './BoundsUpdater';
 
-export function CrimeMap () {
+export default function CrimeMap () {
   const featureGroupRef = useRef(null);
   return (
     <MapContainer

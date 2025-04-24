@@ -1,8 +1,8 @@
 import { useRef } from "react";
 import { FeatureGroup } from "react-leaflet";
-import { BoundsUpdater } from "./BoundsUpdater";
+import BoundsUpdater from "./BoundsUpdater";
 
-export function BoundsControl({ isLoading }) {
+export default function BoundsControl({ isLoading }) {
   const featureGroupRef = useRef(null);
 
   return (

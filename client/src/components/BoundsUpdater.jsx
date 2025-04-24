@@ -3,7 +3,7 @@ import { useFilters } from "../context/FilterContext";
 import { useEffect } from "react";
 
 // Create a new component to handle bounds updates
-export function BoundsUpdater({ group }) {
+export default function BoundsUpdater({ group }) {
   const map = useMap();
   const { filters } = useFilters();
 
