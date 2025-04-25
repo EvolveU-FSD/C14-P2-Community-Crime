@@ -83,6 +83,7 @@ export async function communityFindOneAndUpdate(commCode, name, sector, multiPol
 
 // Find a community boundary by commCode
 export async function findCommunityBoundaryByCommCode(commCode) {
+<<<<<<< HEAD
     try {
         const communityBoundary = await CommunityBoundary.findOne({ commCode: commCode });
         return communityBoundary;
@@ -90,6 +91,10 @@ export async function findCommunityBoundaryByCommCode(commCode) {
         console.error(`Error in findCommunityBoundaryByCommCode: ${error}`);
         throw error;
     }
+=======
+    const communityBoundary = await CommunityBoundary.findOne({ commCode: commCode })
+    return communityBoundary
+>>>>>>> origin/main
 }
 
 // Get all community boundaries

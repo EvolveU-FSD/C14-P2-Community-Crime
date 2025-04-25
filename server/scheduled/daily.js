@@ -133,10 +133,10 @@ export const importCommunityBoundaryData = async () => {
                 const existingCommunityBoundary = await findCommunityBoundaryByCommCode(comm_code);
                 if (existingCommunityBoundary) {
                     console.log(`Updating ${comm_code}`);
-                    existingCommunityBoundary.name = name;
-                    existingCommunityBoundary.sector = sector;
-                    existingCommunityBoundary.boundary = multipolygon;
-                    existingCommunityBoundary.modifiedDate = modified_dt;
+                    existingCommunityBoundary.name = name || existingCommunityBoundary.name;
+                    existingCommunityBoundary.sector = sector || existingCommunityBoundary.sector;
+                    existingCommunityBoundary.boundary = multipolygon || existingCommunityBoundary.boundary;
+                    existingCommunityBoundary.modifiedDate = modified_dt || existingCommunityBoundary.modifiedDate;
                     await existingCommunityBoundary.save();
                 } else {
                     console.log(`Creating ${comm_code} with name ${name}`)
