@@ -51,10 +51,10 @@ export async function createCommunityBoundary(
 }
 
 // Find one and update.
-export async function communityFindOneAndUpdate(code, name, sector, multiPolygon, createdDate, modifiedDate) {
+export async function communityFindOneAndUpdate(commCode, name, sector, multiPolygon, createdDate, modifiedDate) {
     try {
         const filter = {
-            code: code,
+            commCode: commCode,
             name: name,
             sector: sector,
             createdDate: createdDate,
