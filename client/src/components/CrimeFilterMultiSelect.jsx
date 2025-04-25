@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 
 const animatedComponents = makeAnimated();
 
-export function CrimeFilterMultiSelect() {
+export default function CrimeFilterMultiSelect() {
     const [crimeTypeList, setCrimeTypeList] = useState({});
   const { filters, setFilters } = useFilters();
 

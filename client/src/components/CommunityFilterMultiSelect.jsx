@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 
 const animatedComponents = makeAnimated();
 
-export function CommunityFilterMultiSelect() {
+export default function CommunityFilterMultiSelect() {
   const [communityBoundaryList, setCommunityBoundaryList] = useState({});
   const { filters, setFilters } = useFilters();
 
