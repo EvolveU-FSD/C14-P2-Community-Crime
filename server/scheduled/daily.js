@@ -3,6 +3,7 @@ import { connectDb, disconnectDb } from '../db.js';
 import { findOneAndUpdate } from '../models/crimes.js';
 import { communityFindOneAndUpdate, createCommunityBoundary, findCommunityBoundaryByCommCode  } from '../models/communityBoundary.js';
 import { getDatasetMetadata } from '../util/apiUtils.js';
+import { createCrimeDateRecord, findCrimeDateRecordByValues } from '../models/crimeDateRecords.js';
 
 // TODO: Change the type of import to pull in all records from the API at once.
 // Based on documentation here: https://support.socrata.com/hc/en-us/articles/202949268-How-to-query-more-than-1000-rows-of-a-dataset
@@ -10,6 +11,14 @@ const BATCH_SIZE = 1000; // Max records that can be imported at a time.
 const BASE_CRIME_URL = "https://data.calgary.ca/resource/78gh-n26t.json";
 // const BASE_CRIME_URL = "https://data.calgarypolice.ca/api/v2/datasets/crime-statistics";
 const BASE_COMMUNITY_BOUNDARY_URL = "https://data.calgary.ca/resource/surr-xmvs.json";
+
+// When importing the crime data, check if the month and date of the current crime exists in the date range collection.
+async function loadCrimeDateRecord(crimeYear, crimeMonth) {
+   const existingCrimeDateRecord = await findCrimeDateRecordByValues(crimeYear, crimeMonth)
+   if (!existingCrimeDateRecord) {
+    await createCrimeDateRecord(crimeYear, crimeMonth);
+   }
+}
 
 const importCrimeData = async () => {
     const startTime = new Date();
@@ -54,6 +63,9 @@ const importCrimeData = async () => {
                 crimeRecord.month 
                 )
                 totalRecords++;
+
+                // Find if the current year and month is recorded in the extra collection.
+                loadCrimeDateRecord(crimeRecord.year, crimeRecord.month);
             }
 
             console.log(`Processed ${crimeData.length} records. Total records: ${totalRecords}`);
