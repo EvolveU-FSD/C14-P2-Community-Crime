@@ -15,7 +15,7 @@ export default function BoundsUpdater({ group, isLoading, hasBoundaries }) {
     }
 
     // // Only proceed if: Loading is complete, there are boundaries to show, FeatureGroup exists.
-    if (!isLoading && hasBoundaries && group.current) {
+    if (!isLoading && hasBoundaries && group?.current) {
       const timer = setTimeout(() => {
         try {
           // Get the bounds from the featuregroup.
