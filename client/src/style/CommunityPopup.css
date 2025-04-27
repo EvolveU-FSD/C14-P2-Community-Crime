@@ -123,3 +123,38 @@
 .crime-breakdown:hover::after {
   opacity: 1;
 }
+
+.crime-difference {
+  font-size: 14px;
+  margin: 5px 0;
+  padding: 5px;
+  border-radius: 3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.crime-difference.increase {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #d32f2f;
+}
+
+.crime-difference.decrease {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #388e3c;
+}
+
+.crime-difference.unchanged {
+  background-color: rgba(33, 150, 243, 0.1);
+  color: #1976d2;
+}
+
+.crime-difference span {
+  font-weight: bold;
+}
+
+.percent-change {
+  font-size: 12px;
+  margin-left: 5px;
+  opacity: 0.8;
+}

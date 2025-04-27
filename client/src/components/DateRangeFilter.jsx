@@ -100,7 +100,7 @@ export default function DateRangeFilter() {
     }
     
     fetchAvailableDates();
-  }, [setFilters, filters.dateRangeFilter?.endYear]);
+  }, [setFilters]);
 
   // Helper function to get month name
   const getMonthName = (monthNum) => {
@@ -146,7 +146,7 @@ export default function DateRangeFilter() {
     }
   };
 
-// Handle start month selection
+  // Handle start month selection
   const handleStartMonthChange = (selectedOption) => {
     setFilters(prev => ({
       ...prev,
@@ -184,7 +184,7 @@ export default function DateRangeFilter() {
     }
   };
 
-// Handle end year selection
+  // Handle end year selection
   const handleEndYearChange = (selectedOption) => {
     // If start date isn't set and end date is being set, default the start date to earliest
     if ((!filters.dateRangeFilter?.startYear || !filters.dateRangeFilter?.startMonth) && 
@@ -242,7 +242,7 @@ export default function DateRangeFilter() {
     }
   };
 
-// Handle end month selection
+  // Handle end month selection
   const handleEndMonthChange = (selectedOption) => {
     // If start date isn't set and end date is being set, default the start date to earliest
     if ((!filters.dateRangeFilter?.startYear || !filters.dateRangeFilter?.startMonth) && 
@@ -272,10 +272,45 @@ export default function DateRangeFilter() {
     }
   };
 
+  // Handle comparison mode change
+  const handleComparisonModeChange = (e) => {
+    setFilters(prev => ({
+      ...prev,
+      dateRangeFilter: {
+        ...prev.dateRangeFilter,
+        comparisonMode: e.target.value
+      }
+    }));
+  };
+
   return (
     <div className="date-filter-container">
       <div className="date-filter-section">
-        <label className="date-filter-label">From:</label>
+        <div className="date-filter-header">
+          <label className="date-filter-label">From:</label>
+          <div className="radio-group">
+            <label className="radio-label">
+              <input 
+                type="radio" 
+                name="comparisonMode" 
+                value="total" 
+                checked={!filters.dateRangeFilter?.comparisonMode || filters.dateRangeFilter?.comparisonMode === 'total'} 
+                onChange={handleComparisonModeChange}
+              />
+              <span>Total</span>
+            </label>
+            <label className="radio-label">
+              <input 
+                type="radio" 
+                name="comparisonMode" 
+                value="difference" 
+                checked={filters.dateRangeFilter?.comparisonMode === 'difference'} 
+                onChange={handleComparisonModeChange}
+              />
+              <span>Difference</span>
+            </label>
+          </div>
+        </div>
         <div className="date-filter-inputs">
           <Select
             className="year-select"
