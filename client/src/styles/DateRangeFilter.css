@@ -1,0 +1,42 @@
+.date-filter-container {
+  position: absolute;
+  top: 140px;
+  right: 20px;
+  width: 400px;
+  background-color: white;
+  padding: 10px;
+  border-radius: 4px;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+  z-index: 997;
+}
+
+.date-filter-section {
+  margin-bottom: 10px;
+}
+
+.date-filter-label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+.date-filter-inputs {
+  display: flex;
+  gap: 10px;
+}
+
+.year-select {
+  width: 40%;
+}
+
+.month-select {
+  width: 60%;
+}
+
+@media (max-width: 768px) {
+  .date-filter-container {
+    width: 300px;
+  }
+}
