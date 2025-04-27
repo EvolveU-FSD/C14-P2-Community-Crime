@@ -79,13 +79,13 @@ export async function getCrimesByCommunity(filters) {
                 $group: {
                     _id: "$community",
                     totalCrimes: { $sum: "$crimeCount" },
-                    // crimesByCategory: {
-                    //     // In addition to the original grouping, a second grouping exists to also split by crime.
-                    //     $push: {
-                    //         category: "$category",
-                    //         count: "$crimeCount"
-                    //     }
-                    // }
+                    crimesByCategory: {
+                        // In addition to the original grouping, a second grouping exists to also split by crime.
+                        $push: {
+                            category: "$category",
+                            count: "$crimeCount"
+                        }
+                    }
                 }
             },
             {
@@ -127,8 +127,7 @@ export async function getCrimesByCommunity(filters) {
                 $project: {
                     _id: 1,
                     totalCrimes: 1,
-                    // crimesByCategory: 1,
-                    // communityName: "$communityInfo.name",
+                    crimesByCategory: 1,
                     sector: "$communityInfo.sector",
                     commCode: "$communityInfo.commCode",
                     boundary: "$communityInfo.boundary"
