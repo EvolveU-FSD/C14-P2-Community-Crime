@@ -1,6 +1,5 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import chroma from 'chroma-js';
 import '../style/CrimeColourLegend.css';
 
 export default function CrimeColourLegend({ scale, maxCrime }) {
