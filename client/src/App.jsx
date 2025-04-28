@@ -7,7 +7,7 @@ import CrimeMap from './components/CrimeMap';
 import Logo from './components/Logo';
 import React from 'react';
 
-function App() {
+export default function App() {
   return (
     <FilterProvider>
       <Logo />
@@ -19,4 +19,3 @@ function App() {
   );
 }
 
-export default App;

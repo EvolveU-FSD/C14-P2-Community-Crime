@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapContainer, TileLayer } from 'react-leaflet';
+import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import CommunityBoundaries from "./CommunityBoundaries";
 
