@@ -4,8 +4,8 @@
   "description": "Working with City of Calgary public API data, we are building an application to better view the information.",
   "main": "index.js",
   "dependencies": {
+    "morgan": "^1.10.0"
   },
-  "devDependencies": {},
   "scripts": {
     "install:server": "cd server && npm install && cd ..",
     "install:client": "cd client && npm install && cd ..",

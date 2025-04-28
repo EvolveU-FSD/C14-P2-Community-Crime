@@ -12,6 +12,11 @@ app.use(express.static('public'));
 // Get a port from the environment, or default to 3000 if one can't be retrieved.
 const PORT = process.env.PORT || 3000;
 
+//Express package for adding showRequest log to server.
+const morgan = require('morgan');
+app.use(morgan('dev'));
+
+
 // Navigate to the crimeRecordRoutes file when navigating to the home location
 // (http://localhost:3000)- If there was a /name after 3000, it would go in the '/' section below.
 // Next logic goes to routes/crimeRecordRoutes.js.
