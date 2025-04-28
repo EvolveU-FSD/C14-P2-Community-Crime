@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 
-const CrimeDataDisplay = () => {
+export default function CrimeDataDisplay(){
     const [crimes, setCrimes] = useState([]);
     const [communities, setCommunities] = useState([]);
     const [crimeSummary, setCrimeSummary] = useState([]);
@@ -141,5 +141,3 @@ const CrimeDataDisplay = () => {
         </div>
     );
 };
-
-export default CrimeDataDisplay;

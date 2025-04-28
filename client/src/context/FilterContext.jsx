@@ -2,10 +2,16 @@ import React, { createContext, useState, useContext } from 'react';
 
 const FilterContext = createContext();
 
-export function FilterProvider({ children }) {
+export default function FilterProvider({ children }) {
     const [filters, setFilters] = useState({
         communitiesListFilter: [],
-        crimeListFilter: []
+        crimeListFilter: [],
+        dateRangeFilter: {
+            startYear: null,
+            startMonth: null,
+            endYear: null,
+            endMonth: null
+        }
     });
 
     return (

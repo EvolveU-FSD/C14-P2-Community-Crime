@@ -51,10 +51,10 @@ export async function createCommunityBoundary(
 }
 
 // Find one and update.
-export async function communityFindOneAndUpdate(code, name, sector, multiPolygon, createdDate, modifiedDate) {
+export async function communityFindOneAndUpdate(commCode, name, sector, multiPolygon, createdDate, modifiedDate) {
     try {
         const filter = {
-            code: code,
+            commCode: commCode,
             name: name,
             sector: sector,
             createdDate: createdDate,
@@ -104,7 +104,7 @@ export async function findCommunityBoundaryById(id) {
 // Export just the distinct community names with comm code.
 export async function getCommunityBoundaryList() {
     try {
-        const communityBoundaryListFull = await CommunityBoundary.find({});
+        const communityBoundaryListFull = await CommunityBoundary.find({}).sort({ name: 1, commCode: 1 });
         const communityBoundaryList = communityBoundaryListFull.map(community => ({
             value: community.commCode,
             label: community.name
