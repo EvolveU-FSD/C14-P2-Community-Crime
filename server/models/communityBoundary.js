@@ -1,14 +1,11 @@
 import { connectDb } from "../db.js";
 
-// Create a mongoose connection from the db file.
 const mongoose = await connectDb();
 
-// Schema
 const communityBoundarySchema = mongoose.Schema({
     commCode: String,
     name: String,
     sector: String,
-    // multiPolygon: multiPolygon,
     boundary: {
         type: {
             type: String,
@@ -22,43 +19,46 @@ const communityBoundarySchema = mongoose.Schema({
     },
     createdDate: Date,
     modifiedDate: Date
-})
+});
 
 communityBoundarySchema.index({ boundary: '2dsphere' });
 
-// Models
 const CommunityBoundary = mongoose.model('communityBoundary', communityBoundarySchema, 'communityBoundaries');
 
-// Functions to expose the tables/collection
-// Create a new record.
+// Create a new record
 export async function createCommunityBoundary(
-        commCode,
-        name,
-        sector,
-        boundary,
-        createdDate,
-        modifiedDate
-    ) {
-    const newCommunityBoundary = await CommunityBoundary.create({
-        commCode,
-        name,
-        sector,
-        boundary,
-        createdDate,
-        modifiedDate
-    })
-    return newCommunityBoundary
+    commCode,
+    name,
+    sector,
+    boundary,
+    createdDate,
+    modifiedDate
+) {
+    try {
+        const newCommunityBoundary = await CommunityBoundary.create({
+            commCode,
+            name,
+            sector,
+            boundary,
+            createdDate,
+            modifiedDate
+        });
+        return newCommunityBoundary;
+    } catch (error) {
+        console.error(`Error in createCommunityBoundary: ${error}`);
+        throw error;
+    }
 }
 
-// Find one and update.
+// Update or insert a record
 export async function communityFindOneAndUpdate(commCode, name, sector, multiPolygon, createdDate, modifiedDate) {
     try {
         const filter = {
-            commCode: commCode,
+            code: commCode,
             name: name,
             sector: sector,
             createdDate: createdDate,
-        }
+        };
 
         const update = {
             boundary: {
@@ -66,39 +66,53 @@ export async function communityFindOneAndUpdate(commCode, name, sector, multiPol
                 coordinates: multiPolygon
             },
             modifiedDate: modifiedDate
-        }
+        };
 
         const options = {
             upsert: true,
             new: true
-        }
+        };
 
         const newBoundary = await CommunityBoundary.findOneAndUpdate(filter, update, options);
         return newBoundary;
     } catch (error) {
-        console.error(`Error in findOneAndUpdate: ${error}`);
+        console.error(`Error in communityFindOneAndUpdate: ${error}`);
         throw error;
     }
 }
 
+// Find a community boundary by commCode
 export async function findCommunityBoundaryByCommCode(commCode) {
-    const communityBoundary = await CommunityBoundary.findOne({ commCode: commCode })
-    return communityBoundary
+
+    try {
+        const communityBoundary = await CommunityBoundary.findOne({ commCode: commCode });
+        return communityBoundary;
+    } catch (error) {
+        console.error(`Error in findCommunityBoundaryByCommCode: ${error}`);
+        throw error;
+    }
 }
 
-// Delete a record (not called from the app).
-
-// Export all records.
+// Get all community boundaries
 export async function findAllCommunityBoundaries() {
-    const communityBoundaries = await CommunityBoundary.find({});
-    return communityBoundaries;
+    try {
+        const communityBoundaries = await CommunityBoundary.find({});
+        return communityBoundaries;
+    } catch (error) {
+        console.error(`Error in findAllCommunityBoundaries: ${error}`);
+        throw error;
+    }
 }
 
-// Find a single record based on id.
-// TODO: consider searching by community instead of id.
+// Find by ID
 export async function findCommunityBoundaryById(id) {
-    const communityBoundary = await CommunityBoundary.findById(id);
-    return communityBoundary;
+    try {
+        const communityBoundary = await CommunityBoundary.findById(id);
+        return communityBoundary;
+    } catch (error) {
+        console.error(`Error in findCommunityBoundaryById: ${error}`);
+        throw error;
+    }
 }
 
 // Export just the distinct community names with comm code.
