@@ -1,19 +1,20 @@
-// App.jsx
-import { FilterProvider } from './context/FilterContext';
-import { MapContainer, TileLayer } from 'react-leaflet';
-import './App.css';
-import { CrimeFilterMultiSelect } from './components/CrimeFilterMultiSelect';
-import { CommunityFilterMultiSelect } from './components/CommunityFilterMultiSelect';
+import FilterProvider from './context/FilterContext';
+import './style/App.css';
+import CrimeFilterMultiSelect from './components/CrimeFilterMultiSelect';
+import CommunityFilterMultiSelect from './components/CommunityFilterMultiSelect';
+import DateRangeFilter from './components/DateRangeFilter';
+import CrimeMap from './components/CrimeMap'; 
+import Logo from './components/Logo';
 import React from 'react';
-import { CrimeMap } from './components/CrimeMap'; 
-
 
 function App() {
   return (
     <FilterProvider>
+      <Logo />
       <CrimeMap />
       <CommunityFilterMultiSelect />
       <CrimeFilterMultiSelect />
+      <DateRangeFilter />
     </FilterProvider>
   );
 }
