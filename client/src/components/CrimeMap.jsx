@@ -1,11 +1,9 @@
-import React, { useRef } from 'react';
-import { FeatureGroup, MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
+import React from 'react';
+import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import CommunityBoundaries from "./CommunityBoundaries";
-import BoundsUpdater from './BoundsUpdater';
 
 export default function CrimeMap () {
-  const featureGroupRef = useRef(null);
   return (
     <MapContainer
         center={[51.0447, -114.0719]} // Calgary center
