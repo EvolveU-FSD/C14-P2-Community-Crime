@@ -32,9 +32,11 @@ export default function DateRangeFilter() {
         
         // Get earliest date for defaulting
         if (dateRanges.length > 0) {
+          const firstDate = dateRanges[0];
+          
           setEarliestDate({
-            year: dateRanges[0].year,
-            month: dateRanges[0].month
+            year: firstDate.year,
+            month: firstDate.month
           });
         }
         
@@ -57,6 +59,39 @@ export default function DateRangeFilter() {
         setMonthOptions(monthOpts);
         setEndMonthOptions(monthOpts);
         
+        // Set default date range after loading data
+        if (dateRanges.length > 0 && !filters.dateRangeFilter?.endYear) {
+          const lastDate = dateRanges[dateRanges.length - 1];
+          
+          // Find the year option for the latest date
+          const latestYearOption = yearOpts.find(y => y.value === lastDate.year);
+          const latestMonthOption = monthOpts.find(m => m.value === lastDate.month);
+          
+          // Calculate default start date (1 year before latest date)
+          let defaultStartYear = lastDate.year - 1;
+          let defaultStartMonth = lastDate.month;
+          
+          // Ensure the start date exists in our dataset
+          // Find the closest available date if the exact 1-year-before date doesn't exist
+          const defaultStartYearOption = yearOpts.find(y => y.value === defaultStartYear) || 
+                                        yearOpts.find(y => y.value <= defaultStartYear) ||
+                                        yearOpts[0];
+          
+          const defaultStartMonthOption = monthOpts.find(m => m.value === defaultStartMonth);
+          
+          // Set the default date range in the filter context
+          setFilters(prev => ({
+            ...prev,
+            dateRangeFilter: {
+              ...prev.dateRangeFilter,
+              startYear: defaultStartYearOption,
+              startMonth: defaultStartMonthOption,
+              endYear: latestYearOption,
+              endMonth: latestMonthOption
+            }
+          }));
+        }
+        
         setLoading(false);
       } catch (error) {
         console.error('Error fetching date ranges:', error);
@@ -65,7 +100,7 @@ export default function DateRangeFilter() {
     }
     
     fetchAvailableDates();
-  }, []);
+  }, [setFilters, filters.dateRangeFilter?.endYear]);
 
   // Helper function to get month name
   const getMonthName = (monthNum) => {
@@ -111,7 +146,7 @@ export default function DateRangeFilter() {
     }
   };
 
-  // Handle start month selection
+// Handle start month selection
   const handleStartMonthChange = (selectedOption) => {
     setFilters(prev => ({
       ...prev,
@@ -149,7 +184,7 @@ export default function DateRangeFilter() {
     }
   };
 
-  // Handle end year selection
+// Handle end year selection
   const handleEndYearChange = (selectedOption) => {
     // If start date isn't set and end date is being set, default the start date to earliest
     if ((!filters.dateRangeFilter?.startYear || !filters.dateRangeFilter?.startMonth) && 
@@ -207,7 +242,7 @@ export default function DateRangeFilter() {
     }
   };
 
-  // Handle end month selection
+// Handle end month selection
   const handleEndMonthChange = (selectedOption) => {
     // If start date isn't set and end date is being set, default the start date to earliest
     if ((!filters.dateRangeFilter?.startYear || !filters.dateRangeFilter?.startMonth) && 
