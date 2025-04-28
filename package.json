@@ -4,7 +4,6 @@
   "description": "Working with City of Calgary public API data, we are building an application to better view the information.",
   "main": "index.js",
   "dependencies": {
-    "chroma-js": "^3.1.2"
   },
   "devDependencies": {},
   "scripts": {
