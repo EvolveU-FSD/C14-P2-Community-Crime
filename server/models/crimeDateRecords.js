@@ -2,12 +2,6 @@ import { connectDb } from "../db.js";
 
 const mongoose = await connectDb();
 
-// Schema
-const crimeDateRecordsSchema = mongoose.Schema({
-    year: Number,
-    month: Number,
-})
-
 // Models
 export const CrimeDateRecord = mongoose.model('crimeDate', crimeDateRecordsSchema, 'crimeDate');
 

@@ -2,15 +2,6 @@
 import { connectDb } from '../db.js';
 const mongoose = await connectDb();
 
-// Schema
-const crimeRecordSchema = mongoose.Schema({
-    community: String,
-    category: String,
-    crimeCount: Number,
-    year: Number,
-    month: Number,
-});
-
 // Models
 export const CrimeRecord = mongoose.model('crime', crimeRecordSchema, 'crimeData');
 

@@ -2,25 +2,6 @@ import { connectDb } from "../db.js";
 
 const mongoose = await connectDb();
 
-const communityBoundarySchema = mongoose.Schema({
-    commCode: String,
-    name: String,
-    sector: String,
-    boundary: {
-        type: {
-            type: String,
-            enum: ['MultiPolygon'],
-            required: true
-        },
-        coordinates: {
-            type: [[[[Number]]]],
-            required: true
-        }
-    },
-    createdDate: Date,
-    modifiedDate: Date
-});
-
 communityBoundarySchema.index({ boundary: '2dsphere' });
 
 const CommunityBoundary = mongoose.model('communityBoundary', communityBoundarySchema, 'communityBoundaries');
