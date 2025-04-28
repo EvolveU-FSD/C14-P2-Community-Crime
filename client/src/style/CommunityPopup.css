@@ -1,0 +1,125 @@
+.community-popup-content {
+  min-width: 250px;
+  max-width: 350px;
+  font-family: Arial, sans-serif;
+  padding-right: 5px; /* Add padding for scrollbar */
+}
+
+.community-popup-content h3 {
+  margin: 0 0 10px 0;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #eee;
+  font-size: 16px;
+  color: #333;
+}
+
+.crime-total {
+  font-size: 14px;
+  margin: 5px 0;
+  padding-bottom: 5px;
+  border-bottom: 1px dotted #eee;
+}
+
+.crime-total span {
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+.crime-breakdown {
+  margin-top: 10px;
+  position: relative;
+}
+
+.crime-breakdown h4 {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #555;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.crime-breakdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 5px 0 0 0;
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 5px 10px 5px 5px; /* Right padding for scrollbar */
+  scrollbar-width: thin; /* For Firefox */
+}
+
+.crime-breakdown li {
+  margin-bottom: 5px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dotted #eee;
+  padding-bottom: 3px;
+}
+
+.crime-type {
+  max-width: 75%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 10px;
+}
+
+.crime-count {
+  font-weight: bold;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.community-sector {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #777;
+  font-style: italic;
+}
+
+/* Style for scrollbar in crime list */
+.crime-breakdown ul::-webkit-scrollbar {
+  width: 8px;
+}
+
+.crime-breakdown ul::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.crime-breakdown ul::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+  border: 2px solid #f5f5f5;
+}
+
+.crime-breakdown ul::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+.crime-breakdown {
+  position: relative;
+}
+
+/* Add fade at the bottom to indicate more content as a fixed overlay */
+.crime-breakdown::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 8px; /* Account for scrollbar width */
+  height: 20px;
+  background: linear-gradient(transparent, rgba(255,255,255,0.9));
+  pointer-events: none;
+  z-index: 1; /* Ensure it's above the list */
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.crime-breakdown:hover::after {
+  opacity: 1;
+}
