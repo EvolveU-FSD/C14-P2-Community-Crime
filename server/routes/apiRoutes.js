@@ -2,6 +2,7 @@ import express from 'express';
 import { findAllCommunityBoundaries, findCommunityBoundaryByCommCode, getCommunityBoundaryList } from '../models/communityBoundary.js';
 import { findAllCrimeRecords, getCrimeTypeList } from '../models/crimes.js';
 import { getCrimesByCategoryAndCommunity, getCrimesByCommunity, getCrimesByCommunityAndYear } from '../models/summaries.js';
+import { CrimeDateRecord } from '../models/crimeDateRecords.js';
 
 const router = express.Router();
 
@@ -95,6 +96,16 @@ router.get('/crimeTypeList', async (req, res) => {
     try {
         const crimeTypeList = await getCrimeTypeList();
         res.json(crimeTypeList);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Date Range route.
+router.get('/dateRanges', async (req, res) => {
+    try {
+        const dateRanges = await CrimeDateRecord.find({}).sort({ year: 1, month: 1 });
+        res.json(dateRanges);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
