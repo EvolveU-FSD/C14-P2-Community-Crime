@@ -1,5 +1,5 @@
 import FilterProvider from './context/FilterContext';
-import './App.css';
+import './style/App.css';
 import CrimeFilterMultiSelect from './components/CrimeFilterMultiSelect';
 import CommunityFilterMultiSelect from './components/CommunityFilterMultiSelect';
 import CrimeMap from './components/CrimeMap'; 
