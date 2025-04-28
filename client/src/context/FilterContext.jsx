@@ -5,7 +5,13 @@ const FilterContext = createContext();
 export default function FilterProvider({ children }) {
     const [filters, setFilters] = useState({
         communitiesListFilter: [],
-        crimeListFilter: []
+        crimeListFilter: [],
+        dateRangeFilter: {
+            startYear: null,
+            startMonth: null,
+            endYear: null,
+            endMonth: null
+        }
     });
 
     return (

@@ -10,7 +10,6 @@ export default function CommunityBoundaries() {
     const [communityBoundary, setCommunityBoundary] = useState([]);
     const [maxCrime, setMaxCrime] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
 
     // Build a reusable function that may be extracted out to convert geojson to be leaflet usable.
     // TODO: Extract the function out as a utility to be used elsewhere.
@@ -74,8 +73,6 @@ export default function CommunityBoundaries() {
         // Run the function outlined above.
         fetchFilteredCommunityData();
     }, [filters])
-
-    if (error) return <div>Error loading communities: {error}</div>
 
     // Set the scale of colours that will exist, from green to red with yellow in the middle.
     const scale = chroma.scale(['#00ff00', '#ffff00', '#ff0000'])
