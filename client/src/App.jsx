@@ -29,7 +29,7 @@ import CommunityBoundaries from './components/CommunityBoundaries'
 // };
 
 
-export function App () {
+export default function App () {
   return (
     <FilterProvider>
       <CommunityFilterMultiSelect />
