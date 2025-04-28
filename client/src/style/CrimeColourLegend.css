@@ -1,0 +1,56 @@
+.crime-color-legend {
+  position: fixed; /* Change from absolute to fixed */
+  bottom: 20px;
+  right: 20px;
+  background-color: white;
+  padding: 10px;
+  border-radius: 4px;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+  z-index: 1000; /* Much higher z-index to ensure it's above Leaflet elements */
+  width: 250px;
+  max-width: 25%;  /* Limit to 25% of viewport width */
+  opacity: 0.9;    /* Slightly transparent */
+  pointer-events: none; /* Allow clicking through the legend to the map */
+}
+
+.crime-color-legend h3 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #333;
+  text-align: center;
+}
+
+.legend-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.legend-gradient {
+  height: 20px;
+  border-radius: 2px;
+  margin-bottom: 5px;
+}
+
+.legend-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
+}
+
+.legend-label {
+  text-align: center;
+  white-space: nowrap;  /* Prevent wrapping of numbers */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .crime-color-legend {
+    width: auto;
+    min-width: 150px;
+  }
+  
+  .legend-label {
+    font-size: 10px;  /* Smaller font on mobile */
+  }
+}
