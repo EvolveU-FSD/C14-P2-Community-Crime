@@ -1,0 +1,28 @@
+{
+  "name": "c14-p2-community-crime",
+  "version": "1.0.0",
+  "description": "Working with City of Calgary public API data, we are building an application to better view the information.",
+  "main": "index.js",
+  "dependencies": {
+    "chroma-js": "^3.1.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "install:server": "cd server && npm install && cd ..",
+    "install:client": "cd client && npm install && cd ..",
+    "install": "npm run install:server && npm run install:client",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm run start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EvolveU-FSD/C14-P2-Community-Crime.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EvolveU-FSD/C14-P2-Community-Crime/issues"
+  },
+  "homepage": "https://github.com/EvolveU-FSD/C14-P2-Community-Crime#readme"
+}
