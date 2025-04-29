@@ -1,3 +1,4 @@
 node_modules/
 playground-1.mongodb.js
 server/.env
+.env
