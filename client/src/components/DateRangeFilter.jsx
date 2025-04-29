@@ -345,32 +345,33 @@ export default function DateRangeFilter() {
 
   return (
     <div className="date-range-content">
-      <div className="date-filter-section">
-        <div className="date-filter-header">
-          <label className="date-filter-label">From:</label>
-          <div className="radio-group">
-            <label className="radio-label">
-              <input 
-                type="radio" 
-                name="comparisonMode" 
-                value="total" 
-                checked={!filters.dateRangeFilter?.comparisonMode || filters.dateRangeFilter?.comparisonMode === 'total'} 
-                onChange={handleComparisonModeChange}
-              />
-              <span>Total</span>
-            </label>
-            <label className="radio-label">
-              <input 
-                type="radio" 
-                name="comparisonMode" 
-                value="difference" 
-                checked={filters.dateRangeFilter?.comparisonMode === 'difference'} 
-                onChange={handleComparisonModeChange}
-              />
-              <span>Difference</span>
-            </label>
-          </div>
+      <div className="date-filter-mode">
+        <div className="radio-group">
+          <label className="radio-label">
+            <input 
+              type="radio" 
+              name="comparisonMode" 
+              value="total" 
+              checked={!filters.dateRangeFilter?.comparisonMode || filters.dateRangeFilter?.comparisonMode === 'total'} 
+              onChange={handleComparisonModeChange}
+            />
+            <span>Total</span>
+          </label>
+          <label className="radio-label">
+            <input 
+              type="radio" 
+              name="comparisonMode" 
+              value="difference" 
+              checked={filters.dateRangeFilter?.comparisonMode === 'difference'} 
+              onChange={handleComparisonModeChange}
+            />
+            <span>Difference</span>
+          </label>
         </div>
+      </div>
+      
+      <div className="date-filter-section">
+        <label className="date-filter-label">From:</label>
         <div className="date-filter-inputs">
           <Select
             className="year-select"
@@ -420,31 +421,6 @@ export default function DateRangeFilter() {
             isLoading={loading}
             classNamePrefix="date-select"
           />
-        </div>
-      </div>
-      
-      <div className="date-filter-mode">
-        <div className="radio-group">
-          <label className="radio-label">
-            <input 
-              type="radio" 
-              name="comparisonMode" 
-              value="total" 
-              checked={!filters.dateRangeFilter?.comparisonMode || filters.dateRangeFilter?.comparisonMode === 'total'} 
-              onChange={handleComparisonModeChange}
-            />
-            <span>Total</span>
-          </label>
-          <label className="radio-label">
-            <input 
-              type="radio" 
-              name="comparisonMode" 
-              value="difference" 
-              checked={filters.dateRangeFilter?.comparisonMode === 'difference'} 
-              onChange={handleComparisonModeChange}
-            />
-            <span>Difference</span>
-          </label>
         </div>
       </div>
     </div>
