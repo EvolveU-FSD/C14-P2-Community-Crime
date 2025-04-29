@@ -15,6 +15,7 @@ export default function CommunityBoundaries() {
     const [isLoading, setIsLoading] = useState(true);
     const [currentData, setCurrentData] = useState({}); 
     const [startData, setStartData] = useState({}); 
+    const [fromDateSummary, setFromDateSummary] = useState([]); // Add this state
 
     // Build a reusable function that may be extracted out for leaflet usable coordinates.
     function swapGeoJsonCoordinates(geojson) {
@@ -64,7 +65,8 @@ export default function CommunityBoundaries() {
                     });
                     
                     const fromDateSummary = await fromDateResponse.json();
-                    
+                    setFromDateSummary(fromDateSummary); // Add this line to store the full data
+
                     // Create a lookup map for "From" data
                     const fromDateMap = {};
                     fromDateSummary.forEach(community => {
@@ -217,6 +219,60 @@ export default function CommunityBoundaries() {
         }
     };
 
+    // New helper function for difference mode to merge and compare crime data 
+    const prepareDifferenceBreakdown = (community) => {
+        if (!community || !community.crimesByCategory) return [];
+        
+        // Get crime data from the current community ("To" data)
+        const toData = {};
+        community.crimesByCategory.forEach(crime => {
+            if (!toData[crime.category]) {
+                toData[crime.category] = 0;
+            }
+            toData[crime.category] += crime.count;
+        });
+        
+        // Get crime data from the fromDateSummary
+        const fromDateCommunity = fromDateSummary?.find(c => c._id === community._id);
+        const fromData = {};
+        
+        if (fromDateCommunity?.crimesByCategory) {
+            fromDateCommunity.crimesByCategory.forEach(crime => {
+                if (!fromData[crime.category]) {
+                    fromData[crime.category] = 0;
+                }
+                fromData[crime.category] += crime.count;
+            });
+        }
+        
+        // Merge the data for comparison
+        const mergedCategories = new Set([
+            ...Object.keys(fromData),
+            ...Object.keys(toData)
+        ]);
+        
+        // Create combined dataset with differences
+        const comparisonData = Array.from(mergedCategories).map(category => {
+            const fromValue = fromData[category] || 0;
+            const toValue = toData[category] || 0;
+            const difference = toValue - fromValue;
+            const percentChange = fromValue > 0 
+                ? Math.round((difference / fromValue) * 100) 
+                : toValue > 0 ? 100 : 0;
+                
+            return {
+                category,
+                from: fromValue,
+                to: toValue,
+                difference,
+                percentChange
+            };
+        });
+        
+        // Sort by absolute difference (largest changes first)
+        return comparisonData.sort((a, b) => Math.abs(b.difference) - Math.abs(a.difference));
+    };
+
     // Helper function to process crime data for display
     const processAndSummarizeCrimeData = (crimesByCategory) => {
         if (!crimesByCategory || crimesByCategory.length === 0) return [];
@@ -263,18 +319,76 @@ export default function CommunityBoundaries() {
                                         <>
                                             <p className="crime-total">
                                                 From Date: <span>{community.startValue}</span>
+                                                &nbsp;&nbsp;To Date: <span>{community.totalCrimes}</span>
                                             </p>
-                                            <p className="crime-total">
-                                                To Date: <span>{community.totalCrimes}</span>
-                                            </p>
-                                            <p className={`crime-difference ${community.difference > 0 ? 'increase' : community.difference < 0 ? 'decrease' : 'unchanged'}`}>
-                                                Change: <span>{community.difference > 0 ? '+' : ''}{community.difference}</span>
-                                                {community.difference !== 0 && community.startValue > 0 && (
-                                                    <span className="percent-change">
-                                                        ({Math.round((community.difference / community.startValue) * 100)}%)
-                                                    </span>
+                                            <p className={`crime-difference ${
+                                                community.totalCrimes === 0 && community.startValue === 0 
+                                                    ? 'zero-crime' 
+                                                    : community.difference > 0 
+                                                        ? 'increase' 
+                                                        : community.difference < 0 
+                                                            ? 'decrease' 
+                                                            : 'unchanged'
+                                            }`}>
+                                                {community.totalCrimes === 0 && community.startValue === 0 ? (
+                                                    <>No crimes recorded in either period</>
+                                                ) : (
+                                                    <>
+                                                        Change: <span>{community.difference > 0 ? '+' : ''}{community.difference}</span>
+                                                        {community.difference !== 0 && community.startValue > 0 && (
+                                                            <span className="percent-change">
+                                                                ({Math.round((community.difference / community.startValue) * 100)}%)
+                                                            </span>
+                                                        )}
+                                                    </>
                                                 )}
                                             </p>
+                                            
+                                            {/* Crime breakdown comparison table */}
+                                            <div className="crime-comparison">
+                                                <h4>Crime Comparison:</h4>
+                                                <div className="comparison-table-container">
+                                                    <table className="comparison-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Crime Type</th>
+                                                                <th>From</th>
+                                                                <th>To</th>
+                                                                <th>Change</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {community.crimesByCategory && community.crimesByCategory.length > 0 ? (
+                                                                prepareDifferenceBreakdown(community).map((item, index) => (
+                                                                    <tr key={index} className={
+                                                                        item.difference > 0 
+                                                                            ? 'row-increase' 
+                                                                            : item.difference < 0 
+                                                                                ? 'row-decrease' 
+                                                                                : 'row-unchanged'
+                                                                    }>
+                                                                        <td className="crime-type-cell">{item.category}</td>
+                                                                        <td>{item.from}</td>
+                                                                        <td>{item.to}</td>
+                                                                        <td className="change-cell">
+                                                                            {item.difference > 0 ? '+' : ''}{item.difference}
+                                                                            {item.difference !== 0 && item.from > 0 && (
+                                                                                <span className="percent-change">
+                                                                                    ({item.percentChange > 0 ? '+' : ''}{item.percentChange}%)
+                                                                                </span>
+                                                                            )}
+                                                                        </td>
+                                                                    </tr>
+                                                                ))
+                                                            ) : (
+                                                                <tr>
+                                                                    <td colSpan="4" className="no-data">No crime breakdown available</td>
+                                                                </tr>
+                                                            )}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
                                         </>
                                     ) : filters.crimeListFilter?.length === 0 ? (
                                         <>
