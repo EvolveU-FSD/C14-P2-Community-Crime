@@ -298,39 +298,37 @@ export default function DateRangeFilter() {
   // Handle comparison mode change
   const handleComparisonModeChange = (e) => {
     // When switching to difference mode, make sure dates are set
-    if (e.target.value === 'difference') {
-      // If dates aren't set, set defaults
-      if (!filters.dateRangeFilter?.startYear || !filters.dateRangeFilter?.startMonth ||
-          !filters.dateRangeFilter?.endYear || !filters.dateRangeFilter?.endMonth) {
-        
-        // Find latest date
-        const lastDate = {
-          year: Math.max(...yearOptions.map(y => y.value)),
-          month: 12
-        };
-        
-        // Calculate default start date (1 year before latest)
-        const defaultStartYear = Math.max(earliestDate.year, lastDate.year - 1);
-        const defaultStartMonth = lastDate.month;
-        
-        const latestYearOption = yearOptions.find(y => y.value === lastDate.year);
-        const latestMonthOption = monthOptions.find(m => m.value === lastDate.month);
-        const defaultStartYearOption = yearOptions.find(y => y.value === defaultStartYear);
-        const defaultStartMonthOption = monthOptions.find(m => m.value === defaultStartMonth);
-        
-        setFilters(prev => ({
-          ...prev,
-          dateRangeFilter: {
-            ...prev.dateRangeFilter,
-            startYear: defaultStartYearOption || prev.dateRangeFilter?.startYear,
-            startMonth: defaultStartMonthOption || prev.dateRangeFilter?.startMonth,
-            endYear: latestYearOption || prev.dateRangeFilter?.endYear,
-            endMonth: latestMonthOption || prev.dateRangeFilter?.endMonth,
-            comparisonMode: e.target.value
-          }
-        }));
-        return;
+    if (e.target.value === 'difference' &&
+      (!filters.dateRangeFilter?.startYear || !filters.dateRangeFilter?.startMonth ||
+       !filters.dateRangeFilter?.endYear || !filters.dateRangeFilter?.endMonth)) {
+      
+      // Find latest date
+      const lastDate = {
+      year: Math.max(...yearOptions.map(y => y.value)),
+      month: 12
+      };
+      
+      // Calculate default start date (1 year before latest)
+      const defaultStartYear = Math.max(earliestDate.year, lastDate.year - 1);
+      const defaultStartMonth = lastDate.month;
+      
+      const latestYearOption = yearOptions.find(y => y.value === lastDate.year);
+      const latestMonthOption = monthOptions.find(m => m.value === lastDate.month);
+      const defaultStartYearOption = yearOptions.find(y => y.value === defaultStartYear);
+      const defaultStartMonthOption = monthOptions.find(m => m.value === defaultStartMonth);
+      
+      setFilters(prev => ({
+      ...prev,
+      dateRangeFilter: {
+        ...prev.dateRangeFilter,
+        startYear: defaultStartYearOption || prev.dateRangeFilter?.startYear,
+        startMonth: defaultStartMonthOption || prev.dateRangeFilter?.startMonth,
+        endYear: latestYearOption || prev.dateRangeFilter?.endYear,
+        endMonth: latestMonthOption || prev.dateRangeFilter?.endMonth,
+        comparisonMode: e.target.value
       }
+      }));
+      return;
     }
     
     // Standard mode change
