@@ -166,19 +166,10 @@
   opacity: 0.8;
 }
 
-/* Add these styles for the comparison table */
+/* Add these styles for the comparison table and percentage display */
 
-.crime-comparison {
-  margin-top: 10px;
-}
-
-.crime-comparison h4 {
-  margin: 5px 0;
-  font-size: 14px;
-  color: #555;
-}
-
-.comparison-table-container {
+/* Fix the percent-change display for scrollable tables */
+.crime-comparison .comparison-table-container {
   max-height: 200px;
   overflow-y: auto;
   border: 1px solid #eee;
@@ -191,6 +182,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
+  table-layout: fixed; /* Fixed layout for better control */
 }
 
 .comparison-table th {
@@ -201,26 +193,58 @@
   text-align: left;
   border-bottom: 1px solid #ddd;
   font-weight: bold;
+  z-index: 10; /* Ensure header stays above scrolling content */
 }
 
 .comparison-table td {
   padding: 4px 5px;
   border-bottom: 1px dotted #eee;
+  vertical-align: top; /* Align to top to handle multi-line content */
 }
 
-.comparison-table tr:last-child td {
-  border-bottom: none;
+/* Make sure the crime type column is wide enough */
+.comparison-table th:first-child,
+.comparison-table td:first-child {
+  width: 40%;
 }
 
-.comparison-table .crime-type-cell {
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* Ensure the change column is wide enough for both the number and percentage */
+.comparison-table th:last-child,
+.comparison-table td:last-child {
+  width: 25%;
+}
+
+/* Container for change value and percentage to keep them together */
+.change-container {
+  display: inline-block; /* Keep it in the text flow */
+  white-space: nowrap; /* Keep number and percentage together */
+  max-width: 100%; /* Prevent overflow */
+  overflow: hidden; /* Hide overflow content */
+  text-overflow: ellipsis; /* Show ellipsis for overflow */
+}
+
+.difference-value {
+  font-weight: bold;
+}
+
+.percent-change {
+  font-size: 11px;
+  color: #666;
+  margin-left: 2px;
   white-space: nowrap;
 }
 
-.comparison-table .change-cell {
-  font-weight: bold;
+/* Style for row colors */
+.comparison-table tr.row-increase {
+  background-color: rgba(244, 67, 54, 0.1);
+}
+
+.comparison-table tr.row-decrease {
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+.comparison-table tr.row-unchanged {
+  background-color: rgba(33, 150, 243, 0.1);
 }
 
 .comparison-table .row-increase .change-cell {
@@ -240,23 +264,4 @@
   color: #999;
   font-style: italic;
   padding: 10px;
-}
-
-/* Add fade at the bottom to indicate more content in the table */
-.comparison-table-container::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 8px; /* Account for scrollbar width */
-  height: 20px;
-  background: linear-gradient(transparent, rgba(255,255,255,0.9));
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.comparison-table-container:hover::after {
-  opacity: 1;
 }
