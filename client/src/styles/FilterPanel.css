@@ -59,22 +59,22 @@
 .filter-content {
   max-height: calc(100vh - 150px);
   overflow-y: auto;
-  padding: 12px;
-  padding-bottom: 30px;
+  padding: 10px; /* Reduced from 12px */
+  padding-bottom: 15px; /* Reduced from 30px */
   flex: 1 1 auto;
 }
 
 .filter-section {
-  margin-bottom: 15px;
+  margin-bottom: 12px; /* Reduced from 15px */
 }
 
 .filter-section:last-child {
-  margin-bottom: 10px;
-  padding-bottom: 10px;
+  margin-bottom: 5px; /* Reduced from 10px */
+  padding-bottom: 5px; /* Reduced from 10px */
 }
 
 .filter-section h3 {
-  margin: 0 0 8px 0;
+  margin: 0 0 6px 0; /* Reduced from 8px */
   font-size: 14px;
   color: #555;
 }
@@ -171,8 +171,8 @@
 
 .filter-content.mobile {
   flex: 1;
-  padding: 15px;
-  padding-bottom: 120px;
+  padding: 12px; /* Reduced from 15px */
+  padding-bottom: 100px; /* Reduced from 120px */
 }
 
 @keyframes slideIn {
@@ -237,25 +237,20 @@
   
   .filter-content {
     max-height: calc(100vh - 160px);
-    padding-bottom: 30px;
+    padding-bottom: 20px; /* Reduced from 30px */
   }
 }
 
 /* Fix for React-Select components */
 .filter-content .css-13cymwt-control,
 .filter-content .css-t3ipsp-control {
-  min-height: 36px;
-}
-
-.filter-content .css-1nmdiq5-menu {
-  z-index: 1001;
+  min-height: 32px; /* Reduced from 36px */
 }
 
 /* Ensure radio buttons have enough space */
 .date-filter-mode {
-  margin-top: 15px;
-  margin-bottom: 10px;
-  padding-bottom: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 .radio-group {

@@ -2,42 +2,38 @@
   width: 100%;
 }
 
-.date-filter-section {
-  margin-bottom: 10px;
-}
-
-.date-filter-header {
+/* New header with title and radio buttons side by side */
+.date-range-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 5px;
+  margin-bottom: 8px; /* Reduced from 10px */
+}
+
+.date-range-title {
+  font-size: 0; /* Hide visually but maintain in the structure */
+  color: transparent;
+}
+
+.date-filter-section {
+  margin-bottom: 8px; /* Reduced from 10px */
+}
+
+/* Add special class for the last section */
+.last-filter-section {
+  margin-bottom: 0; /* Remove bottom margin from last item */
 }
 
 .date-filter-label {
+  display: block;
+  margin-bottom: 3px; /* Reduced from 5px */
   font-size: 14px;
   color: #333;
 }
 
-.radio-group {
-  display: flex;
-  gap: 15px;
-}
-
-.radio-label {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  font-size: 13px;
-  user-select: none;
-}
-
-.radio-label input {
-  margin-right: 4px;
-}
-
 .date-filter-inputs {
   display: flex;
-  gap: 10px;
+  gap: 8px; /* Reduced from 10px */
 }
 
 .year-select {
@@ -48,37 +44,59 @@
   width: 60%;
 }
 
+/* Radio button styling */
 .radio-group {
   display: flex;
-  gap: 15px;
-  padding-bottom: 5px; /* Add padding to ensure visibility */
+  gap: 10px; /* Reduced from 15px */
+  align-items: center;
 }
 
 .radio-label {
   display: flex;
   align-items: center;
-  font-size: 14px;
+  font-size: 13px; /* Reduced from 14px */
+  color: #555;
   cursor: pointer;
-  padding: 2px 0; /* Add vertical padding */
+  padding: 0; /* Remove extra padding */
 }
 
 .radio-label input {
-  margin-right: 5px;
+  margin-right: 3px; /* Reduced from 5px */
+  min-width: 14px; /* Reduced from 16px */
+  min-height: 14px; /* Reduced from 16px */
 }
 
+/* Override FilterPanel styles to remove extra padding */
+.filter-section:last-child {
+  margin-bottom: 5px !important; /* Override FilterPanel styles */
+  padding-bottom: 0 !important; /* Override FilterPanel styles */
+}
+
+/* Adjust React Select components for tighter UI */
+.date-select__control {
+  min-height: 32px !important;
+}
+
+.date-select__indicators {
+  padding: 0 4px !important;
+}
+
+.date-select__value-container {
+  padding: 0 6px !important;
+}
+
+.date-select__input-container {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Mobile adjustments */
 @media (max-width: 768px) {
-  .date-filter-container {
-    width: 300px;
-  }
-  
   .radio-label {
     font-size: 12px;
   }
   
   .radio-group {
-    gap: 8px;
+    gap: 6px;
   }
-.date-filter-mode {
-  margin-top: 15px;
-  margin-bottom: 10px; /* Add bottom margin */
 }
