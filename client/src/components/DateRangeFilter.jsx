@@ -11,6 +11,9 @@ export default function DateRangeFilter() {
   const [endMonthOptions, setEndMonthOptions] = useState([]);
   const [earliestDate, setEarliestDate] = useState({ year: null, month: null });
   const { filters, setFilters } = useFilters();
+  
+  // Check if we're in difference mode
+  const isDifferenceMode = filters.dateRangeFilter?.comparisonMode === 'difference';
 
   // Fetch available dates when component mounts
   useEffect(() => {
@@ -100,7 +103,7 @@ export default function DateRangeFilter() {
     }
     
     fetchAvailableDates();
-  }, [setFilters, filters.dateRangeFilter?.endYear]);
+  }, [setFilters]);
 
   // Helper function to get month name
   const getMonthName = (monthNum) => {
@@ -113,6 +116,11 @@ export default function DateRangeFilter() {
 
   // Handle start year selection
   const handleStartYearChange = (selectedOption) => {
+    // In difference mode, if trying to clear, revert to previous value
+    if (isDifferenceMode && !selectedOption && filters.dateRangeFilter?.startYear) {
+      return; // Prevent clearing in difference mode
+    }
+    
     setFilters(prev => ({
       ...prev,
       dateRangeFilter: {
@@ -141,13 +149,18 @@ export default function DateRangeFilter() {
         }));
       }
     } else {
-      // If start year cleared, reset end year options
+      // If start year cleared (only in Total mode), reset end year options
       setEndYearOptions(yearOptions);
     }
   };
 
-// Handle start month selection
+  // Handle start month selection
   const handleStartMonthChange = (selectedOption) => {
+    // In difference mode, if trying to clear, revert to previous value
+    if (isDifferenceMode && !selectedOption && filters.dateRangeFilter?.startMonth) {
+      return; // Prevent clearing in difference mode
+    }
+    
     setFilters(prev => ({
       ...prev,
       dateRangeFilter: {
@@ -184,8 +197,13 @@ export default function DateRangeFilter() {
     }
   };
 
-// Handle end year selection
+  // Handle end year selection
   const handleEndYearChange = (selectedOption) => {
+    // In difference mode, if trying to clear, revert to previous value
+    if (isDifferenceMode && !selectedOption && filters.dateRangeFilter?.endYear) {
+      return; // Prevent clearing in difference mode
+    }
+    
     // If start date isn't set and end date is being set, default the start date to earliest
     if ((!filters.dateRangeFilter?.startYear || !filters.dateRangeFilter?.startMonth) && 
         selectedOption && earliestDate.year !== null) {
@@ -242,8 +260,13 @@ export default function DateRangeFilter() {
     }
   };
 
-// Handle end month selection
+  // Handle end month selection
   const handleEndMonthChange = (selectedOption) => {
+    // In difference mode, if trying to clear, revert to previous value
+    if (isDifferenceMode && !selectedOption && filters.dateRangeFilter?.endMonth) {
+      return; // Prevent clearing in difference mode
+    }
+    
     // If start date isn't set and end date is being set, default the start date to earliest
     if ((!filters.dateRangeFilter?.startYear || !filters.dateRangeFilter?.startMonth) && 
         selectedOption && earliestDate.year !== null) {
@@ -272,10 +295,82 @@ export default function DateRangeFilter() {
     }
   };
 
+  // Handle comparison mode change
+  const handleComparisonModeChange = (e) => {
+    // When switching to difference mode, make sure dates are set
+    if (e.target.value === 'difference') {
+      // If dates aren't set, set defaults
+      if (!filters.dateRangeFilter?.startYear || !filters.dateRangeFilter?.startMonth ||
+          !filters.dateRangeFilter?.endYear || !filters.dateRangeFilter?.endMonth) {
+        
+        // Find latest date
+        const lastDate = {
+          year: Math.max(...yearOptions.map(y => y.value)),
+          month: 12
+        };
+        
+        // Calculate default start date (1 year before latest)
+        const defaultStartYear = Math.max(earliestDate.year, lastDate.year - 1);
+        const defaultStartMonth = lastDate.month;
+        
+        const latestYearOption = yearOptions.find(y => y.value === lastDate.year);
+        const latestMonthOption = monthOptions.find(m => m.value === lastDate.month);
+        const defaultStartYearOption = yearOptions.find(y => y.value === defaultStartYear);
+        const defaultStartMonthOption = monthOptions.find(m => m.value === defaultStartMonth);
+        
+        setFilters(prev => ({
+          ...prev,
+          dateRangeFilter: {
+            ...prev.dateRangeFilter,
+            startYear: defaultStartYearOption || prev.dateRangeFilter?.startYear,
+            startMonth: defaultStartMonthOption || prev.dateRangeFilter?.startMonth,
+            endYear: latestYearOption || prev.dateRangeFilter?.endYear,
+            endMonth: latestMonthOption || prev.dateRangeFilter?.endMonth,
+            comparisonMode: e.target.value
+          }
+        }));
+        return;
+      }
+    }
+    
+    // Standard mode change
+    setFilters(prev => ({
+      ...prev,
+      dateRangeFilter: {
+        ...prev.dateRangeFilter,
+        comparisonMode: e.target.value
+      }
+    }));
+  };
+
   return (
     <div className="date-filter-container">
       <div className="date-filter-section">
-        <label className="date-filter-label">From:</label>
+        <div className="date-filter-header">
+          <label className="date-filter-label">From:</label>
+          <div className="radio-group">
+            <label className="radio-label">
+              <input 
+                type="radio" 
+                name="comparisonMode" 
+                value="total" 
+                checked={!filters.dateRangeFilter?.comparisonMode || filters.dateRangeFilter?.comparisonMode === 'total'} 
+                onChange={handleComparisonModeChange}
+              />
+              <span>Total</span>
+            </label>
+            <label className="radio-label">
+              <input 
+                type="radio" 
+                name="comparisonMode" 
+                value="difference" 
+                checked={filters.dateRangeFilter?.comparisonMode === 'difference'} 
+                onChange={handleComparisonModeChange}
+              />
+              <span>Difference</span>
+            </label>
+          </div>
+        </div>
         <div className="date-filter-inputs">
           <Select
             className="year-select"
@@ -283,7 +378,7 @@ export default function DateRangeFilter() {
             value={filters.dateRangeFilter?.startYear}
             onChange={handleStartYearChange}
             options={yearOptions}
-            isClearable
+            isClearable={!isDifferenceMode}
             isLoading={loading}
           />
           <Select
@@ -293,7 +388,7 @@ export default function DateRangeFilter() {
             onChange={handleStartMonthChange}
             options={monthOptions}
             isDisabled={!filters.dateRangeFilter?.startYear || loading}
-            isClearable
+            isClearable={!isDifferenceMode}
             isLoading={loading}
           />
         </div>
@@ -308,7 +403,7 @@ export default function DateRangeFilter() {
             value={filters.dateRangeFilter?.endYear}
             onChange={handleEndYearChange}
             options={endYearOptions}
-            isClearable
+            isClearable={!isDifferenceMode}
             isLoading={loading}
           />
           <Select
@@ -318,7 +413,7 @@ export default function DateRangeFilter() {
             onChange={handleEndMonthChange}
             options={endMonthOptions}
             isDisabled={!filters.dateRangeFilter?.endYear || loading}
-            isClearable
+            isClearable={!isDifferenceMode}
             isLoading={loading}
           />
         </div>

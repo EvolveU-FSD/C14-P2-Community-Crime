@@ -123,3 +123,140 @@
 .crime-breakdown:hover::after {
   opacity: 1;
 }
+
+.crime-difference {
+  font-size: 14px;
+  margin: 5px 0;
+  padding: 5px;
+  border-radius: 3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.crime-difference.increase {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #d32f2f;
+}
+
+.crime-difference.decrease {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #388e3c;
+}
+
+.crime-difference.unchanged {
+  background-color: rgba(33, 150, 243, 0.1);
+  color: #1976d2;
+}
+
+.crime-difference.zero-crime {
+  background-color: rgba(33, 150, 243, 0.1);
+  color: #1976d2;
+  text-align: center;
+  font-style: italic;
+}
+
+.crime-difference span {
+  font-weight: bold;
+}
+
+.percent-change {
+  font-size: 12px;
+  margin-left: 5px;
+  opacity: 0.8;
+}
+
+/* Add these styles for the comparison table */
+
+.crime-comparison {
+  margin-top: 10px;
+}
+
+.crime-comparison h4 {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.comparison-table-container {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  margin-top: 5px;
+  scrollbar-width: thin;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.comparison-table th {
+  position: sticky;
+  top: 0;
+  background-color: #f5f5f5;
+  padding: 5px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  font-weight: bold;
+}
+
+.comparison-table td {
+  padding: 4px 5px;
+  border-bottom: 1px dotted #eee;
+}
+
+.comparison-table tr:last-child td {
+  border-bottom: none;
+}
+
+.comparison-table .crime-type-cell {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.comparison-table .change-cell {
+  font-weight: bold;
+}
+
+.comparison-table .row-increase .change-cell {
+  color: #d32f2f;
+}
+
+.comparison-table .row-decrease .change-cell {
+  color: #388e3c;
+}
+
+.comparison-table .row-unchanged .change-cell {
+  color: #1976d2;
+}
+
+.comparison-table .no-data {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  padding: 10px;
+}
+
+/* Add fade at the bottom to indicate more content in the table */
+.comparison-table-container::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 8px; /* Account for scrollbar width */
+  height: 20px;
+  background: linear-gradient(transparent, rgba(255,255,255,0.9));
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.comparison-table-container:hover::after {
+  opacity: 1;
+}
