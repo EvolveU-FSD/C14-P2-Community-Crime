@@ -4,7 +4,7 @@ import { Polygon, Popup } from 'react-leaflet';
 import chroma from "chroma-js";
 import BoundsControl from "./BoundsControl";
 import CrimeColourLegend from "./CrimeColourLegend";
-import "../style/CommunityPopup.css";
+import "../styles/CommunityPopup.css";
 
 export default function CommunityBoundaries() {
     const { filters } = useFilters();
