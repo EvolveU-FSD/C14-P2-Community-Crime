@@ -149,6 +149,13 @@
   color: #1976d2;
 }
 
+.crime-difference.zero-crime {
+  background-color: rgba(33, 150, 243, 0.1);
+  color: #1976d2;
+  text-align: center;
+  font-style: italic;
+}
+
 .crime-difference span {
   font-weight: bold;
 }

@@ -16,8 +16,7 @@ export default function CommunityBoundaries() {
     const [currentData, setCurrentData] = useState({}); 
     const [startData, setStartData] = useState({}); 
 
-    // Build a reusable function that may be extracted out to conv that may be extracted outert conv that may be extracted outert conv that may be extracted outerteaflet usable.
-// TODO: Extract the function out as a utility to be used elsewhere.
+    // Build a reusable function that may be extracted out for leaflet usable coordinates.
     function swapGeoJsonCoordinates(geojson) {
         if (!geojson || !geojson.type || !geojson.coordinates) return geojson;
 
@@ -42,71 +41,63 @@ export default function CommunityBoundaries() {
         async function fetchFilteredCommunityData() {
             setIsLoading(true);
             try {
-                // Get the "TO" date data (end date)
-                const toDateFilters = { ...filters };
-                const crimeSummary = await fetch('/api/crimeSummary', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(toDateFilters)
-                }).then(res => res.json());
-
-                // Extract max crime value for color scaling (for "Total" mode)
-                if (crimeSummary.length > 0) {
-                    setMaxCrime(crimeSummary[0].totalCrimes);
-                }
+                let crimeSummary;
+                const isDifferenceMode = filters.dateRangeFilter?.comparisonMode === 'difference';
                 
-                // Create a lookup map for "To" data
-                const toDateMap = {};
-                crimeSummary.forEach(community => {
-                    toDateMap[community._id] = community.totalCrimes;
-                });
-                setCurrentData(toDateMap);
-                
-                // Process coordinates
-                const communitiesWithSwappedCoords = crimeSummary.map(communityRecord => ({
-                    ...communityRecord,
-                    boundary: swapGeoJsonCoordinates(communityRecord.boundary)
-                }));
-                
-                // If in difference mode and we have both start and end dates specified
-                if (filters.dateRangeFilter?.comparisonMode === 'difference' && 
+                if (isDifferenceMode && 
                     filters.dateRangeFilter?.startYear && 
-                    filters.dateRangeFilter?.startMonth) {
+                    filters.dateRangeFilter?.startMonth && 
+                    filters.dateRangeFilter?.endYear && 
+                    filters.dateRangeFilter?.endMonth) {
                     
-                    // Fetch "FROM" date data (start date)
-                    const fromDateFilters = { 
-                        ...filters,
-                        dateRangeFilter: {
-                            startYear: null,
-                            startMonth: null,
-                            endYear: filters.dateRangeFilter.startYear,
-                            endMonth: filters.dateRangeFilter.startMonth,
-                            comparisonMode: 'total'
-                        }
-                    };
-                    
-                    const fromDateSummary = await fetch('/api/crimeSummary', {
+                    // Fetch both from and to data before processing either
+                    // Fetch "FROM" date data (start date) using new endpoint first
+                    const fromDateResponse = await fetch('/api/crimeByDate', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(fromDateFilters)
-                    }).then(res => res.json());
+                        body: JSON.stringify({
+                            year: filters.dateRangeFilter.startYear.value,
+                            month: filters.dateRangeFilter.startMonth.value,
+                            communitiesListFilter: filters.communitiesListFilter,
+                            crimeListFilter: filters.crimeListFilter
+                        })
+                    });
+                    
+                    const fromDateSummary = await fromDateResponse.json();
                     
                     // Create a lookup map for "From" data
                     const fromDateMap = {};
                     fromDateSummary.forEach(community => {
                         fromDateMap[community._id] = community.totalCrimes;
                     });
-                    setStartData(fromDateMap);
                     
-                    // Calculate differences for each community
-                    // IMPORTANT: difference = TO date value - FROM date value
-                    // This means positive values show an increase over time
+                    // Fetch "TO" date data (end date) using new endpoint
+                    const toDateResponse = await fetch('/api/crimeByDate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            year: filters.dateRangeFilter.endYear.value,
+                            month: filters.dateRangeFilter.endMonth.value,
+                            communitiesListFilter: filters.communitiesListFilter,
+                            crimeListFilter: filters.crimeListFilter
+                        })
+                    });
+                    
+                    crimeSummary = await toDateResponse.json();
+                    
+                    // Process coordinates
+                    const communitiesWithSwappedCoords = crimeSummary.map(communityRecord => ({
+                        ...communityRecord,
+                        boundary: swapGeoJsonCoordinates(communityRecord.boundary)
+                    }));
+                    
+                    // Now calculate differences with the data we already have
                     let maxDiff = 0;
                     let minDiff = 0;
                     
                     communitiesWithSwappedCoords.forEach(community => {
                         const fromValue = fromDateMap[community._id] || 0;
-                        const toValue = community.totalCrimes;
+                        const toValue = community.totalCrimes || 0;
                         const difference = toValue - fromValue; // Current - Previous
                         
                         community.startValue = fromValue; // Adding start value for display
@@ -116,11 +107,49 @@ export default function CommunityBoundaries() {
                         if (difference < minDiff) minDiff = difference;
                     });
                     
+                    // Set all the state after processing
+                    setStartData(fromDateMap);
+                    setCurrentData(Object.fromEntries(
+                        crimeSummary.map(community => [community._id, community.totalCrimes])
+                    ));
                     setMaxDifference(maxDiff);
                     setMinDifference(minDiff);
+                    setCommunityBoundary(communitiesWithSwappedCoords);
+                    
+                    if (crimeSummary.length > 0) {
+                        setMaxCrime(crimeSummary[0].totalCrimes);
+                    }
+                } else {
+                    // In total mode, use the original API endpoint
+                    const toDateFilters = { ...filters };
+                    const response = await fetch('/api/crimeSummary', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(toDateFilters)
+                    });
+                    
+                    crimeSummary = await response.json();
+                    
+                    // Extract max crime value for color scaling (for "Total" mode)
+                    if (crimeSummary.length > 0) {
+                        setMaxCrime(crimeSummary[0].totalCrimes);
+                    }
+                    
+                    // Create a lookup map for "To" data
+                    const toDateMap = {};
+                    crimeSummary.forEach(community => {
+                        toDateMap[community._id] = community.totalCrimes;
+                    });
+                    setCurrentData(toDateMap);
+                    
+                    // Process coordinates
+                    const communitiesWithSwappedCoords = crimeSummary.map(communityRecord => ({
+                        ...communityRecord,
+                        boundary: swapGeoJsonCoordinates(communityRecord.boundary)
+                    }));
+                    
+                    setCommunityBoundary(communitiesWithSwappedCoords);
                 }
-
-                setCommunityBoundary(communitiesWithSwappedCoords);
             } catch (error) {
                 console.error(`Error fetching community: ${error}`);
             } finally {
@@ -131,15 +160,17 @@ export default function CommunityBoundaries() {
         fetchFilteredCommunityData();
     }, [filters]);
 
-    // Your existing color scales
+    // Scale for total mode - green to red
     const totalScale = chroma.scale(['#00ff00', '#ffff00', '#ff0000'])
         .domain([0, maxCrime]);
         
     const differenceScale = (value) => {
-        if (value === 0) return chroma('#2196F3'); // Blue for no change
+        // If no change or both values are 0, use blue
+        if (value === 0) return chroma('#2196F3');
         
         // Get max absolute value for proper scaling
         const absMax = Math.max(Math.abs(minDifference), Math.abs(maxDifference));
+        if (absMax === 0) return chroma('#2196F3'); // Handle edge case
         
         if (value > 0) {
             // Positive difference (increase) - use red scale
@@ -157,6 +188,17 @@ export default function CommunityBoundaries() {
         const isDifferenceMode = filters.dateRangeFilter?.comparisonMode === 'difference';
         
         if (isDifferenceMode && 'difference' in community) {
+            // Special case for communities with zero crime in both periods
+            if (community.totalCrimes === 0 && community.startValue === 0) {
+                const color = chroma('#2196F3').hex(); // Blue for communities with zero crime in both periods
+                return {
+                    color,
+                    fillColor: color,
+                    fillOpacity: 0.3,
+                    weight: 4
+                };
+            }
+            
             const color = differenceScale(community.difference).hex();
             return {
                 color,
@@ -287,8 +329,12 @@ export default function CommunityBoundaries() {
 
             <CrimeColourLegend 
                 scale={filters.dateRangeFilter?.comparisonMode === 'difference' ? differenceScale : totalScale} 
-                maxValue={filters.dateRangeFilter?.comparisonMode === 'difference' ? maxDifference : maxCrime} 
-                minValue={filters.dateRangeFilter?.comparisonMode === 'difference' ? minDifference : 0}
+                maxValue={filters.dateRangeFilter?.comparisonMode === 'difference' 
+                    ? Math.max(Math.abs(minDifference), Math.abs(maxDifference)) 
+                    : maxCrime} 
+                minValue={filters.dateRangeFilter?.comparisonMode === 'difference' 
+                    ? -Math.max(Math.abs(minDifference), Math.abs(maxDifference)) 
+                    : 0}
                 mode={filters.dateRangeFilter?.comparisonMode || 'total'}
             />
         </>

@@ -9,10 +9,10 @@ export default function CrimeColourLegend({ scale, maxValue, minValue = 0, mode 
     if (!scale) return;
     
     const steps = [];
-    const stepCount = 5;
+    const stepCount = 5; // Total number of steps
     
     if (mode === 'difference') {
-      // For difference mode, create a diverging scale
+      // For difference mode, create a symmetrical diverging scale
       const absMax = Math.max(Math.abs(minValue), Math.abs(maxValue));
       
       // Handle the case where there's no difference
@@ -23,41 +23,38 @@ export default function CrimeColourLegend({ scale, maxValue, minValue = 0, mode 
           color: scale(0).hex()
         });
       } else {
-        // Create steps for decrease (negative values)
-        if (minValue < 0) {
-          const decreaseSteps = Math.floor(stepCount / 2);
-          for (let i = decreaseSteps; i > 0; i--) {
-            const value = -1 * Math.round((absMax * i) / decreaseSteps);
-            steps.push({
-              value,
-              label: value.toString(),
-              color: scale(value).hex()
-            });
-          }
+        // Create an even number of steps on both sides
+        const stepsPerSide = Math.floor(stepCount / 2);
+        
+        // Negative steps (decreases) - Use green
+        for (let i = stepsPerSide; i > 0; i--) {
+          const value = -absMax * i / stepsPerSide;
+          steps.push({
+            value,
+            label: Math.round(value).toString(),
+            color: scale(value).hex()
+          });
         }
         
-        // Add zero point
+        // Add zero point - Use blue
         steps.push({
           value: 0,
           label: "0",
           color: scale(0).hex()
         });
         
-        // Create steps for increase (positive values)
-        if (maxValue > 0) {
-          const increaseSteps = Math.floor(stepCount / 2);
-          for (let i = 1; i <= increaseSteps; i++) {
-            const value = Math.round((maxValue * i) / increaseSteps);
-            steps.push({
-              value,
-              label: "+" + value.toString(),
-              color: scale(value).hex()
-            });
-          }
+        // Positive steps (increases) - Use red
+        for (let i = 1; i <= stepsPerSide; i++) {
+          const value = absMax * i / stepsPerSide;
+          steps.push({
+            value,
+            label: "+" + Math.round(value).toString(),
+            color: scale(value).hex()
+          });
         }
       }
     } else {
-      // Regular total mode - linear scale
+      // Regular total mode - linear scale (green to red)
       for (let i = 0; i <= stepCount; i++) {
         const value = Math.round((maxValue * i) / stepCount);
         steps.push({
