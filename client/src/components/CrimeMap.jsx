@@ -2,7 +2,6 @@ import React from 'react';
 import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import CommunityBoundaries from "./CommunityBoundaries";
-import '../style/CrimeMap.css'; 
 
 export default function CrimeMap () {
   return (
@@ -12,12 +11,13 @@ export default function CrimeMap () {
         className="leaflet-container"
         zoomControl={false} // Disable default zoom control
       >
-        <ZoomControl position="bottomright" /> 
+        <ZoomControl position="bottomleft" /> {/* Add custom positioned zoom control */}
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
+        {/* Add the community boundaries drawing. */}
         <CommunityBoundaries />
       </MapContainer>
   );

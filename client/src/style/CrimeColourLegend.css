@@ -1,16 +1,16 @@
 .crime-color-legend {
-  position: fixed;
+  position: fixed; /* Change from absolute to fixed */
   bottom: 20px;
-  left: 20px;
+  right: 20px;
   background-color: white;
   padding: 10px;
   border-radius: 4px;
   box-shadow: 0 1px 5px rgba(0,0,0,0.4);
-  z-index: 1000;
+  z-index: 1000; /* Much higher z-index to ensure it's above Leaflet elements */
   width: 250px;
-  max-width: 25%;
-  opacity: 0.9;
-  pointer-events: none;
+  max-width: 25%;  /* Limit to 25% of viewport width */
+  opacity: 0.9;    /* Slightly transparent */
+  pointer-events: none; /* Allow clicking through the legend to the map */
 }
 
 .crime-color-legend h3 {
@@ -40,7 +40,7 @@
 
 .legend-label {
   text-align: center;
-  white-space: nowrap;
+  white-space: nowrap;  /* Prevent wrapping of numbers */
 }
 
 /* Responsive adjustments */
@@ -51,6 +51,6 @@
   }
   
   .legend-label {
-    font-size: 10px;
+    font-size: 10px;  /* Smaller font on mobile */
   }
 }
