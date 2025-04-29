@@ -25,7 +25,7 @@ export default function BoundsUpdater({ group, isLoading, hasBoundaries }) {
           if (bounds.isValid()) {
             console.log("Updating with valid bounds.");
             map.fitBounds(bounds, {
-              padding: [20, 20],
+              padding: [5, 5],
               animate: true,
               duration: 0.5
             });
