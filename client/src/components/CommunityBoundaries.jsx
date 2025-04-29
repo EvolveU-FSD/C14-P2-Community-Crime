@@ -15,7 +15,7 @@ export default function CommunityBoundaries() {
     const [isLoading, setIsLoading] = useState(true);
     const [currentData, setCurrentData] = useState({}); 
     const [startData, setStartData] = useState({}); 
-    const [fromDateSummary, setFromDateSummary] = useState([]); // Add this state
+    const [fromDateSummary, setFromDateSummary] = useState([]); 
 
     // Build a reusable function that may be extracted out for leaflet usable coordinates.
     function swapGeoJsonCoordinates(geojson) {
@@ -38,11 +38,135 @@ export default function CommunityBoundaries() {
         }
     }
 
+    // Function to fetch data for a specific date
+    const fetchCrimeByDate = async (year, month, communitiesListFilter, crimeListFilter) => {
+        const response = await fetch('/api/crimeByDate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                year,
+                month,
+                communitiesListFilter,
+                crimeListFilter
+            })
+        });
+        
+        return await response.json();
+    };
+
+    // Function to fetch summary data
+    const fetchCrimeSummary = async (filterParams) => {
+        const response = await fetch('/api/crimeSummary', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(filterParams)
+        });
+        
+        return await response.json();
+    };
+
+    // Process data for difference mode
+    const processDifferenceData = async (startYear, startMonth, endYear, endMonth, communitiesListFilter, crimeListFilter) => {
+        // Fetch "FROM" date data
+        const fromDateSummary = await fetchCrimeByDate(
+            startYear, 
+            startMonth, 
+            communitiesListFilter, 
+            crimeListFilter
+        );
+        setFromDateSummary(fromDateSummary);
+
+        // Create a lookup map for "From" data
+        const fromDateMap = {};
+        fromDateSummary.forEach(community => {
+            fromDateMap[community._id] = community.totalCrimes;
+        });
+        
+        // Fetch "TO" date data
+        const crimeSummary = await fetchCrimeByDate(
+            endYear, 
+            endMonth, 
+            communitiesListFilter, 
+            crimeListFilter
+        );
+        
+        // Process coordinates
+        const communitiesWithSwappedCoords = processCommunityCoordinates(crimeSummary);
+        
+        // Calculate differences
+        const { maxDiff, minDiff } = calculateDifferences(communitiesWithSwappedCoords, fromDateMap);
+        
+        // Set all the state after processing
+        setStartData(fromDateMap);
+        setCurrentData(Object.fromEntries(
+            crimeSummary.map(community => [community._id, community.totalCrimes])
+        ));
+        setMaxDifference(maxDiff);
+        setMinDifference(minDiff);
+        setCommunityBoundary(communitiesWithSwappedCoords);
+        
+        if (crimeSummary.length > 0) {
+            setMaxCrime(crimeSummary[0].totalCrimes);
+        }
+
+        return communitiesWithSwappedCoords;
+    };
+
+    // Process data for total mode
+    const processTotalData = async (filterParams) => {
+        const crimeSummary = await fetchCrimeSummary(filterParams);
+        
+        // Extract max crime value for color scaling
+        if (crimeSummary.length > 0) {
+            setMaxCrime(crimeSummary[0].totalCrimes);
+        }
+        
+        // Create a lookup map for data
+        const dataMap = {};
+        crimeSummary.forEach(community => {
+            dataMap[community._id] = community.totalCrimes;
+        });
+        setCurrentData(dataMap);
+        
+        // Process coordinates
+        const communitiesWithSwappedCoords = processCommunityCoordinates(crimeSummary);
+        
+        setCommunityBoundary(communitiesWithSwappedCoords);
+        return communitiesWithSwappedCoords;
+    };
+
+    // Process community coordinates
+    const processCommunityCoordinates = (crimeSummary) => {
+        return crimeSummary.map(communityRecord => ({
+            ...communityRecord,
+            boundary: swapGeoJsonCoordinates(communityRecord.boundary)
+        }));
+    };
+
+    // Calculate differences between two datasets
+    const calculateDifferences = (communities, fromDataMap) => {
+        let maxDiff = 0;
+        let minDiff = 0;
+        
+        communities.forEach(community => {
+            const fromValue = fromDataMap[community._id] || 0;
+            const toValue = community.totalCrimes || 0;
+            const difference = toValue - fromValue;
+            
+            community.startValue = fromValue;
+            community.difference = difference;
+            
+            if (difference > maxDiff) maxDiff = difference;
+            if (difference < minDiff) minDiff = difference;
+        });
+        
+        return { maxDiff, minDiff };
+    };
+
     useEffect(() => {
         async function fetchFilteredCommunityData() {
             setIsLoading(true);
             try {
-                let crimeSummary;
                 const isDifferenceMode = filters.dateRangeFilter?.comparisonMode === 'difference';
                 
                 if (isDifferenceMode && 
@@ -51,106 +175,18 @@ export default function CommunityBoundaries() {
                     filters.dateRangeFilter?.endYear && 
                     filters.dateRangeFilter?.endMonth) {
                     
-                    // Fetch both from and to data before processing either
-                    // Fetch "FROM" date data (start date) using new endpoint first
-                    const fromDateResponse = await fetch('/api/crimeByDate', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            year: filters.dateRangeFilter.startYear.value,
-                            month: filters.dateRangeFilter.startMonth.value,
-                            communitiesListFilter: filters.communitiesListFilter,
-                            crimeListFilter: filters.crimeListFilter
-                        })
-                    });
-                    
-                    const fromDateSummary = await fromDateResponse.json();
-                    setFromDateSummary(fromDateSummary); // Add this line to store the full data
-
-                    // Create a lookup map for "From" data
-                    const fromDateMap = {};
-                    fromDateSummary.forEach(community => {
-                        fromDateMap[community._id] = community.totalCrimes;
-                    });
-                    
-                    // Fetch "TO" date data (end date) using new endpoint
-                    const toDateResponse = await fetch('/api/crimeByDate', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            year: filters.dateRangeFilter.endYear.value,
-                            month: filters.dateRangeFilter.endMonth.value,
-                            communitiesListFilter: filters.communitiesListFilter,
-                            crimeListFilter: filters.crimeListFilter
-                        })
-                    });
-                    
-                    crimeSummary = await toDateResponse.json();
-                    
-                    // Process coordinates
-                    const communitiesWithSwappedCoords = crimeSummary.map(communityRecord => ({
-                        ...communityRecord,
-                        boundary: swapGeoJsonCoordinates(communityRecord.boundary)
-                    }));
-                    
-                    // Now calculate differences with the data we already have
-                    let maxDiff = 0;
-                    let minDiff = 0;
-                    
-                    communitiesWithSwappedCoords.forEach(community => {
-                        const fromValue = fromDateMap[community._id] || 0;
-                        const toValue = community.totalCrimes || 0;
-                        const difference = toValue - fromValue; // Current - Previous
-                        
-                        community.startValue = fromValue; // Adding start value for display
-                        community.difference = difference;
-                        
-                        if (difference > maxDiff) maxDiff = difference;
-                        if (difference < minDiff) minDiff = difference;
-                    });
-                    
-                    // Set all the state after processing
-                    setStartData(fromDateMap);
-                    setCurrentData(Object.fromEntries(
-                        crimeSummary.map(community => [community._id, community.totalCrimes])
-                    ));
-                    setMaxDifference(maxDiff);
-                    setMinDifference(minDiff);
-                    setCommunityBoundary(communitiesWithSwappedCoords);
-                    
-                    if (crimeSummary.length > 0) {
-                        setMaxCrime(crimeSummary[0].totalCrimes);
-                    }
+                    // Process data in difference mode
+                    await processDifferenceData(
+                        filters.dateRangeFilter.startYear.value,
+                        filters.dateRangeFilter.startMonth.value,
+                        filters.dateRangeFilter.endYear.value,
+                        filters.dateRangeFilter.endMonth.value,
+                        filters.communitiesListFilter,
+                        filters.crimeListFilter
+                    );
                 } else {
-                    // In total mode, use the original API endpoint
-                    const toDateFilters = { ...filters };
-                    const response = await fetch('/api/crimeSummary', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(toDateFilters)
-                    });
-                    
-                    crimeSummary = await response.json();
-                    
-                    // Extract max crime value for color scaling (for "Total" mode)
-                    if (crimeSummary.length > 0) {
-                        setMaxCrime(crimeSummary[0].totalCrimes);
-                    }
-                    
-                    // Create a lookup map for "To" data
-                    const toDateMap = {};
-                    crimeSummary.forEach(community => {
-                        toDateMap[community._id] = community.totalCrimes;
-                    });
-                    setCurrentData(toDateMap);
-                    
-                    // Process coordinates
-                    const communitiesWithSwappedCoords = crimeSummary.map(communityRecord => ({
-                        ...communityRecord,
-                        boundary: swapGeoJsonCoordinates(communityRecord.boundary)
-                    }));
-                    
-                    setCommunityBoundary(communitiesWithSwappedCoords);
+                    // Process data in total mode
+                    await processTotalData(filters);
                 }
             } catch (error) {
                 console.error(`Error fetching community: ${error}`);
@@ -219,7 +255,7 @@ export default function CommunityBoundaries() {
         }
     };
 
-    // New helper function for difference mode to merge and compare crime data 
+    // Helper function for difference mode to merge and compare crime data 
     const prepareDifferenceBreakdown = (community) => {
         if (!community || !community.crimesByCategory) return [];
         
