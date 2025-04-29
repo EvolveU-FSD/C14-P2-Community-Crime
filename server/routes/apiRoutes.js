@@ -1,7 +1,12 @@
 import express from 'express';
 import { findAllCommunityBoundaries, findCommunityBoundaryByCommCode, getCommunityBoundaryList } from '../models/communityBoundary.js';
 import { findAllCrimeRecords, getCrimeTypeList } from '../models/crimes.js';
-import { getCrimesByCategoryAndCommunity, getCrimesByCategorySingleMonthAndYear, getCrimesByCommunity, getCrimesByCommunityAndYear } from '../models/summaries.js';
+import {
+    getCrimesByCategoryAndCommunity,
+    getCrimesByCategorySingleMonthAndYear,
+    getCrimesByCommunity,
+    getCrimesByCommunityAndYear
+} from '../models/summaries.js';
 import { CrimeDateRecord } from '../models/crimeDateRecords.js';
 
 const router = express.Router();
