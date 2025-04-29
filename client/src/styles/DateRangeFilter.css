@@ -14,12 +14,34 @@
   margin-bottom: 10px;
 }
 
-.date-filter-label {
-  display: block;
+.date-filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 5px;
+}
+
+.date-filter-label {
   font-size: 14px;
   font-weight: bold;
   color: #333;
+}
+
+.radio-group {
+  display: flex;
+  gap: 15px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 13px;
+  user-select: none;
+}
+
+.radio-label input {
+  margin-right: 4px;
 }
 
 .date-filter-inputs {
@@ -38,5 +60,13 @@
 @media (max-width: 768px) {
   .date-filter-container {
     width: 300px;
+  }
+  
+  .radio-label {
+    font-size: 12px;
+  }
+  
+  .radio-group {
+    gap: 8px;
   }
 }
