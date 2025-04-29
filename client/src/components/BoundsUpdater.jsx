@@ -48,12 +48,6 @@ export default function BoundsUpdater({ group, isLoading, hasBoundaries }) {
       }
     };
     
-    // if (group.current) {
-    //   const bounds = group.current.getBounds();
-    //   if (bounds.isValid()) {
-    //     map.fitBounds(bounds, { padding: [50, 50] });
-    //   }
-    // }
   }, [map, group, filters, isLoading, hasBoundaries]);
 
   return null;
