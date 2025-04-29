@@ -1,10 +1,8 @@
 import FilterProvider from './context/FilterContext';
 import './styles/App.css';
-import CrimeFilterMultiSelect from './components/CrimeFilterMultiSelect';
-import CommunityFilterMultiSelect from './components/CommunityFilterMultiSelect';
-import DateRangeFilter from './components/DateRangeFilter';
-import CrimeMap from './components/CrimeMap'; 
+import CrimeMap from './components/CrimeMap';
 import Logo from './components/Logo';
+import FilterPanel from './components/FilterPanel';
 import React from 'react';
 
 export default function App() {
@@ -12,9 +10,7 @@ export default function App() {
     <FilterProvider>
       <Logo />
       <CrimeMap />
-      <CommunityFilterMultiSelect />
-      <CrimeFilterMultiSelect />
-      <DateRangeFilter />
+      <FilterPanel />
     </FilterProvider>
   );
 }

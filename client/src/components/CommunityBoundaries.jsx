@@ -225,34 +225,19 @@ export default function CommunityBoundaries() {
     const getPolygonOptions = (community) => {
         const isDifferenceMode = filters.dateRangeFilter?.comparisonMode === 'difference';
         
-        if (isDifferenceMode && 'difference' in community) {
-            // Special case for communities with zero crime in both periods
-            if (community.totalCrimes === 0 && community.startValue === 0) {
-                const color = chroma('#2196F3').hex(); // Blue for communities with zero crime in both periods
-                return {
-                    color,
-                    fillColor: color,
-                    fillOpacity: 0.3,
-                    weight: 4
-                };
-            }
-            
-            const color = differenceScale(community.difference).hex();
-            return {
-                color,
-                fillColor: color,
-                fillOpacity: 0.3,
-                weight: 4
-            };
-        } else {
-            const color = totalScale(community.totalCrimes).hex();
-            return {
-                color,
-                fillColor: color,
-                fillOpacity: 0.3,
-                weight: 4
-            };
-        }
+        const isZeroCrime = isDifferenceMode && community.totalCrimes === 0 && community.startValue === 0;
+        const color = isZeroCrime 
+            ? chroma('#2196F3').hex() 
+            : isDifferenceMode 
+            ? differenceScale(community.difference).hex() 
+            : totalScale(community.totalCrimes).hex();
+
+        return {
+            color,
+            fillColor: color,
+            fillOpacity: 0.3,
+            weight: 4
+        };
     };
 
     // Helper function for difference mode to merge and compare crime data 
