@@ -15,9 +15,6 @@ if (mongo_uri === defaultURI) {
     console.log(`Connected to dotenv server connection.`)
 }
 
-// TODO: remove the console log when all members are set up with Atlas.
-// console.log(mongo_uri);
-
 let connectionPromise = null
 
 // Export a function that will be used to create a connection to the database listed above.

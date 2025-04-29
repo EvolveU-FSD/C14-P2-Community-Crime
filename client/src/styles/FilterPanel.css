@@ -1,0 +1,275 @@
+/* Desktop Filter Panel */
+.filter-panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 380px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+  z-index: 900;
+  overflow: hidden;
+  max-height: min(calc(100vh - 100px), max-content);
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-panel.collapsed {
+  width: 240px;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 15px;
+  background-color: #f8f8f8;
+  border-bottom: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+.filter-header h2 {
+  margin: 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.toggle-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  padding: 0;
+  margin-left: 5px;
+}
+
+.toggle-button:hover {
+  background-color: #eee;
+}
+
+.filter-content {
+  max-height: calc(100vh - 150px);
+  overflow-y: auto;
+  padding: 10px; /* Reduced from 12px */
+  padding-bottom: 15px; /* Reduced from 30px */
+  flex: 1 1 auto;
+}
+
+.filter-section {
+  margin-bottom: 12px; /* Reduced from 15px */
+}
+
+.filter-section:last-child {
+  margin-bottom: 5px; /* Reduced from 10px */
+  padding-bottom: 5px; /* Reduced from 10px */
+}
+
+.filter-section h3 {
+  margin: 0 0 6px 0; /* Reduced from 8px */
+  font-size: 14px;
+  color: #555;
+}
+
+.filter-summary {
+  padding: 10px 15px;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.4;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+/* Mobile Menu Button */
+.mobile-menu-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: white;
+  border: none;
+  border-radius: 8px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 1001;
+  cursor: pointer;
+}
+
+.hamburger {
+  width: 24px;
+  height: 18px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hamburger span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  border-radius: 3px;
+  background-color: #333;
+  transition: all 0.3s ease;
+}
+
+.hamburger.open span:nth-child(1) {
+  transform: translateY(7.5px) rotate(45deg);
+}
+
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-7.5px) rotate(-45deg);
+}
+
+.filter-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #ff5722;
+  color: white;
+  font-size: 12px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* Mobile Filter Panel */
+.mobile-filter-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 90%;
+  max-width: 350px;
+  height: 100%;
+  background-color: white;
+  box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+  z-index: 1000;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-content.mobile {
+  flex: 1;
+  padding: 12px; /* Reduced from 15px */
+  padding-bottom: 100px; /* Reduced from 120px */
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.filter-header.mobile {
+  position: sticky;
+  top: 0;
+  background-color: #f8f8f8;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.close-button:hover {
+  background-color: #eee;
+}
+
+/* Scrollbar styling */
+.filter-content::-webkit-scrollbar,
+.filter-summary::-webkit-scrollbar {
+  width: 6px;
+}
+
+.filter-content::-webkit-scrollbar-track,
+.filter-summary::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+.filter-content::-webkit-scrollbar-thumb,
+.filter-summary::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.filter-content::-webkit-scrollbar-thumb:hover,
+.filter-summary::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* Media query for smaller screens */
+@media (max-height: 700px) {
+  .filter-panel {
+    max-height: calc(100vh - 120px);
+  }
+  
+  .filter-content {
+    max-height: calc(100vh - 160px);
+    padding-bottom: 20px; /* Reduced from 30px */
+  }
+}
+
+/* Fix for React-Select components */
+.filter-content .css-13cymwt-control,
+.filter-content .css-t3ipsp-control {
+  min-height: 32px; /* Reduced from 36px */
+}
+
+/* Ensure radio buttons have enough space */
+.date-filter-mode {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.radio-group {
+  display: flex;
+  gap: 15px;
+  padding-bottom: 10px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 3px 0;
+  min-height: 24px;
+}
+
+.radio-label input {
+  margin-right: 5px;
+  min-width: 16px;
+  min-height: 16px;
+}

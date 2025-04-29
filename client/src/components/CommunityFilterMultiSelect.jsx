@@ -10,28 +10,23 @@ export default function CommunityFilterMultiSelect() {
   const { filters, setFilters } = useFilters();
 
   useEffect(() => {
-    // Put the fetch in a function to get the master list of all community names.
     async function fetchCommunityBoundaryList() {
-        try {
-            const communityBoundaryResponse = await fetch('/api/communityBoundaryList');
+      try {
+        const communityBoundaryResponse = await fetch('/api/communityBoundaryList');
 
-            if (!communityBoundaryResponse.ok) {
-                throw new Error('Community Boundary list API call error');
-            }
-
-            const communityBoundaryListData = await communityBoundaryResponse.json();
-
-            // Since we have comm code, this has been formatted into an object in the base query.
-            // No need to format it like was needed for the Crimes list.
-            setCommunityBoundaryList(communityBoundaryListData);
-        } catch (error) {
-            console.error(`Error fetching community boundary list: ${error}`);
+        if (!communityBoundaryResponse.ok) {
+          throw new Error('Community Boundary list API call error');
         }
+
+        const communityBoundaryListData = await communityBoundaryResponse.json();
+        setCommunityBoundaryList(communityBoundaryListData);
+      } catch (error) {
+        console.error(`Error fetching community boundary list: ${error}`);
+      }
     }
 
-    // Run the function built above.
     fetchCommunityBoundaryList();
-  }, [])
+  }, []);
 
   const handleChange = (selectedOptions) => {
     setFilters(prev => ({
@@ -41,15 +36,15 @@ export default function CommunityFilterMultiSelect() {
   };
 
   return (
-    <div className='community-select-container'>
-      <Select
-        closeMenuOnSelect={false}
-        components={animatedComponents}
-        onChange={handleChange}
-        isMulti
-        placeholder="Filter by community"
-        options={communityBoundaryList}
-      />
-    </div>
-  )
+    <Select
+      closeMenuOnSelect={false}
+      components={animatedComponents}
+      onChange={handleChange}
+      isMulti
+      placeholder="Filter by community"
+      options={communityBoundaryList}
+      value={filters.communitiesListFilter}
+      classNamePrefix="community-select"
+    />
+  );
 }

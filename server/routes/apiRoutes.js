@@ -1,7 +1,12 @@
 import express from 'express';
 import { findAllCommunityBoundaries, findCommunityBoundaryByCommCode, getCommunityBoundaryList } from '../models/communityBoundary.js';
 import { findAllCrimeRecords, getCrimeTypeList } from '../models/crimes.js';
-import { getCrimesByCategoryAndCommunity, getCrimesByCommunity, getCrimesByCommunityAndYear } from '../models/summaries.js';
+import {
+    getCrimesByCategoryAndCommunity,
+    getCrimesByCategorySingleMonthAndYear,
+    getCrimesByCommunity,
+    getCrimesByCommunityAndYear
+} from '../models/summaries.js';
 import { CrimeDateRecord } from '../models/crimeDateRecords.js';
 
 const router = express.Router();
@@ -108,6 +113,24 @@ router.get('/dateRanges', async (req, res) => {
         res.json(dateRanges);
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+});
+
+// Add the new endpoint to get crime data for a specific month and year
+router.post('/crimeByDate', async (req, res) => {
+    try {
+        const { year, month, communitiesListFilter, crimeListFilter } = req.body;
+        
+        if (!year || !month) {
+            return res.status(400).json({ error: 'Year and month are required' });
+        }
+        
+        const crimeSummary = await getCrimesByCategorySingleMonthAndYear(year, month, communitiesListFilter, crimeListFilter);
+        
+        res.json(crimeSummary);
+    } catch (error) {
+        console.error('Error fetching crime by date:', error);
+        res.status(500).json({ error: error.message });
     }
 });
 
