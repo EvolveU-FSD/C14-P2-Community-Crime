@@ -344,7 +344,7 @@ export default function DateRangeFilter() {
   };
 
   return (
-    <div className="date-filter-container">
+    <div className="date-range-content">
       <div className="date-filter-section">
         <div className="date-filter-header">
           <label className="date-filter-label">From:</label>
@@ -380,6 +380,7 @@ export default function DateRangeFilter() {
             options={yearOptions}
             isClearable={!isDifferenceMode}
             isLoading={loading}
+            classNamePrefix="date-select"
           />
           <Select
             className="month-select"
@@ -390,6 +391,7 @@ export default function DateRangeFilter() {
             isDisabled={!filters.dateRangeFilter?.startYear || loading}
             isClearable={!isDifferenceMode}
             isLoading={loading}
+            classNamePrefix="date-select"
           />
         </div>
       </div>
@@ -405,6 +407,7 @@ export default function DateRangeFilter() {
             options={endYearOptions}
             isClearable={!isDifferenceMode}
             isLoading={loading}
+            classNamePrefix="date-select"
           />
           <Select
             className="month-select"
@@ -415,7 +418,33 @@ export default function DateRangeFilter() {
             isDisabled={!filters.dateRangeFilter?.endYear || loading}
             isClearable={!isDifferenceMode}
             isLoading={loading}
+            classNamePrefix="date-select"
           />
+        </div>
+      </div>
+      
+      <div className="date-filter-mode">
+        <div className="radio-group">
+          <label className="radio-label">
+            <input 
+              type="radio" 
+              name="comparisonMode" 
+              value="total" 
+              checked={!filters.dateRangeFilter?.comparisonMode || filters.dateRangeFilter?.comparisonMode === 'total'} 
+              onChange={handleComparisonModeChange}
+            />
+            <span>Total</span>
+          </label>
+          <label className="radio-label">
+            <input 
+              type="radio" 
+              name="comparisonMode" 
+              value="difference" 
+              checked={filters.dateRangeFilter?.comparisonMode === 'difference'} 
+              onChange={handleComparisonModeChange}
+            />
+            <span>Difference</span>
+          </label>
         </div>
       </div>
     </div>

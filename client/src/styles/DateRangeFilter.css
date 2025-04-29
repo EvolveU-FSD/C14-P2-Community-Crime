@@ -1,13 +1,5 @@
-.date-filter-container {
-  position: absolute;
-  top: 140px;
-  right: 20px;
-  width: 400px;
-  background-color: white;
-  padding: 10px;
-  border-radius: 4px;
-  box-shadow: 0 1px 5px rgba(0,0,0,0.4);
-  z-index: 997;
+.date-range-content {
+  width: 100%;
 }
 
 .date-filter-section {
@@ -23,7 +15,6 @@
 
 .date-filter-label {
   font-size: 14px;
-  font-weight: bold;
   color: #333;
 }
 
@@ -57,6 +48,24 @@
   width: 60%;
 }
 
+.radio-group {
+  display: flex;
+  gap: 15px;
+  padding-bottom: 5px; /* Add padding to ensure visibility */
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 0; /* Add vertical padding */
+}
+
+.radio-label input {
+  margin-right: 5px;
+}
+
 @media (max-width: 768px) {
   .date-filter-container {
     width: 300px;
@@ -69,4 +78,7 @@
   .radio-group {
     gap: 8px;
   }
+.date-filter-mode {
+  margin-top: 15px;
+  margin-bottom: 10px; /* Add bottom margin */
 }
