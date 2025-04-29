@@ -9,6 +9,24 @@ const app = express();
 // Add middleware to process the body.
 app.use(express.json());
 app.use(express.static('public'));
+
+// Add middleware Morgan.
+const express = require('express');
+const morgan = require('morgan');
+
+const middlemorgan = express();
+
+// Use 'dev' format for concise colored output
+app.use(morgan('dev'));
+
+app.get('/', (req, res) => {
+  res.send('Hello, Morgan!');
+});
+
+app.listen(3000, () => {
+  console.log('Server is running on port 5173');
+});
+
 // Get a port from the environment, or default to 3000 if one can't be retrieved.
 const PORT = process.env.PORT || 3000;
 
