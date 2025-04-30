@@ -36,12 +36,27 @@
   gap: 8px; /* Reduced from 10px */
 }
 
+/* Adjust the width proportions of year and month selects */
 .year-select {
-  width: 40%;
+  width: 45%; /* Increased from 40% to give more room for year + clear button */
+  min-width: 90px; /* Ensure minimum width for the year + clear button */
 }
 
 .month-select {
-  width: 60%;
+  width: 55%; /* Reduced from 60% */
+  min-width: 110px; /* Ensure minimum width for the longest month name */
+}
+
+/* Add extra space for the clear button in the year select */
+.date-select__clear-indicator {
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+/* Make the year value container slightly more compact */
+.year-select .date-select__value-container {
+  padding-left: 6px;
+  padding-right: 0;
 }
 
 /* Radio button styling */
@@ -98,5 +113,23 @@
   
   .radio-group {
     gap: 6px;
+  }
+}
+
+/* Additional responsive handling for very small screens */
+@media (max-width: 400px) {
+  .date-filter-inputs {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .year-select,
+  .month-select {
+    width: 100%;
+  }
+  
+  /* Ensure the year select has enough room for the clear button on mobile */
+  .year-select .date-select__control {
+    min-height: 32px;
   }
 }
