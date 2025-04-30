@@ -25,7 +25,7 @@ export default function BoundsUpdater({ group, isLoading, hasBoundaries }) {
           if (bounds.isValid()) {
             console.log("Updating with valid bounds.");
             map.fitBounds(bounds, {
-              padding: [20, 20],
+              padding: [5, 5],
               animate: true,
               duration: 0.5
             });
@@ -48,12 +48,6 @@ export default function BoundsUpdater({ group, isLoading, hasBoundaries }) {
       }
     };
     
-    // if (group.current) {
-    //   const bounds = group.current.getBounds();
-    //   if (bounds.isValid()) {
-    //     map.fitBounds(bounds, { padding: [50, 50] });
-    //   }
-    // }
   }, [map, group, filters, isLoading, hasBoundaries]);
 
   return null;

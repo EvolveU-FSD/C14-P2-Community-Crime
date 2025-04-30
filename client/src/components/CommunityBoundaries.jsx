@@ -4,16 +4,20 @@ import { Polygon, Popup } from 'react-leaflet';
 import chroma from "chroma-js";
 import BoundsControl from "./BoundsControl";
 import CrimeColourLegend from "./CrimeColourLegend";
-import "../style/CommunityPopup.css";
+import "../styles/CommunityPopup.css";
 
 export default function CommunityBoundaries() {
     const { filters } = useFilters();
     const [communityBoundary, setCommunityBoundary] = useState([]);
     const [maxCrime, setMaxCrime] = useState(0);
+    const [maxDifference, setMaxDifference] = useState(0);
+    const [minDifference, setMinDifference] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
+    const [currentData, setCurrentData] = useState({}); 
+    const [startData, setStartData] = useState({}); 
+    const [fromDateSummary, setFromDateSummary] = useState([]); 
 
-    // Build a reusable function that may be extracted out to convert geojson to be leaflet usable.
-    // TODO: Extract the function out as a utility to be used elsewhere.
+    // Build a reusable function that may be extracted out for leaflet usable coordinates.
     function swapGeoJsonCoordinates(geojson) {
         if (!geojson || !geojson.type || !geojson.coordinates) return geojson;
 
@@ -34,36 +38,156 @@ export default function CommunityBoundaries() {
         }
     }
 
-    // When the page loads, this will run once.
-    // TODO: Split the useEffect to load once per filter type change (ie, once on filter.communities and once on filter.crimeCategory)
+    // Function to fetch data for a specific date
+    const fetchCrimeByDate = async (year, month, communitiesListFilter, crimeListFilter) => {
+        const response = await fetch('/api/crimeByDate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                year,
+                month,
+                communitiesListFilter,
+                crimeListFilter
+            })
+        });
+        
+        return await response.json();
+    };
+
+    // Function to fetch summary data
+    const fetchCrimeSummary = async (filterParams) => {
+        const response = await fetch('/api/crimeSummary', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(filterParams)
+        });
+        
+        return await response.json();
+    };
+
+    // Process data for difference mode
+    const processDifferenceData = async (startYear, startMonth, endYear, endMonth, communitiesListFilter, crimeListFilter) => {
+        // Fetch "FROM" date data
+        const fromDateSummary = await fetchCrimeByDate(
+            startYear, 
+            startMonth, 
+            communitiesListFilter, 
+            crimeListFilter
+        );
+        setFromDateSummary(fromDateSummary);
+
+        // Create a lookup map for "From" data
+        const fromDateMap = {};
+        fromDateSummary.forEach(community => {
+            fromDateMap[community._id] = community.totalCrimes;
+        });
+        
+        // Fetch "TO" date data
+        const crimeSummary = await fetchCrimeByDate(
+            endYear, 
+            endMonth, 
+            communitiesListFilter, 
+            crimeListFilter
+        );
+        
+        // Process coordinates
+        const communitiesWithSwappedCoords = processCommunityCoordinates(crimeSummary);
+        
+        // Calculate differences
+        const { maxDiff, minDiff } = calculateDifferences(communitiesWithSwappedCoords, fromDateMap);
+        
+        // Set all the state after processing
+        setStartData(fromDateMap);
+        setCurrentData(Object.fromEntries(
+            crimeSummary.map(community => [community._id, community.totalCrimes])
+        ));
+        setMaxDifference(maxDiff);
+        setMinDifference(minDiff);
+        setCommunityBoundary(communitiesWithSwappedCoords);
+        
+        if (crimeSummary.length > 0) {
+            setMaxCrime(crimeSummary[0].totalCrimes);
+        }
+
+        return communitiesWithSwappedCoords;
+    };
+
+    // Process data for total mode
+    const processTotalData = async (filterParams) => {
+        const crimeSummary = await fetchCrimeSummary(filterParams);
+        
+        // Extract max crime value for color scaling
+        if (crimeSummary.length > 0) {
+            setMaxCrime(crimeSummary[0].totalCrimes);
+        }
+        
+        // Create a lookup map for data
+        const dataMap = {};
+        crimeSummary.forEach(community => {
+            dataMap[community._id] = community.totalCrimes;
+        });
+        setCurrentData(dataMap);
+        
+        // Process coordinates
+        const communitiesWithSwappedCoords = processCommunityCoordinates(crimeSummary);
+        
+        setCommunityBoundary(communitiesWithSwappedCoords);
+        return communitiesWithSwappedCoords;
+    };
+
+    // Process community coordinates
+    const processCommunityCoordinates = (crimeSummary) => {
+        return crimeSummary.map(communityRecord => ({
+            ...communityRecord,
+            boundary: swapGeoJsonCoordinates(communityRecord.boundary)
+        }));
+    };
+
+    // Calculate differences between two datasets
+    const calculateDifferences = (communities, fromDataMap) => {
+        let maxDiff = 0;
+        let minDiff = 0;
+        
+        communities.forEach(community => {
+            const fromValue = fromDataMap[community._id] || 0;
+            const toValue = community.totalCrimes || 0;
+            const difference = toValue - fromValue;
+            
+            community.startValue = fromValue;
+            community.difference = difference;
+            
+            if (difference > maxDiff) maxDiff = difference;
+            if (difference < minDiff) minDiff = difference;
+        });
+        
+        return { maxDiff, minDiff };
+    };
+
     useEffect(() => {
-        // Create a sub function to complete async/await processes.
         async function fetchFilteredCommunityData() {
             setIsLoading(true);
             try {
-                // Add all community records to a record.
-                // TODO: Determine why some communities aren't being matched properly, ie Scarboro/Sunalta.
-                // TODO: Extract the crimeSummary call into the front end API.
-                const crimeSummary = await fetch('/api/crimeSummary', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(filters)
-                }).then(res => res.json());
-
-                // Because crimeSummary is sorted by total crimes with the biggest one first,
-                // we can set the maxCrimes amount by referencing the first record.
-                if (crimeSummary.length > 0) {
-                    setMaxCrime(crimeSummary[0].totalCrimes);
+                const isDifferenceMode = filters.dateRangeFilter?.comparisonMode === 'difference';
+                
+                if (isDifferenceMode && 
+                    filters.dateRangeFilter?.startYear && 
+                    filters.dateRangeFilter?.startMonth && 
+                    filters.dateRangeFilter?.endYear && 
+                    filters.dateRangeFilter?.endMonth) {
+                    
+                    // Process data in difference mode
+                    await processDifferenceData(
+                        filters.dateRangeFilter.startYear.value,
+                        filters.dateRangeFilter.startMonth.value,
+                        filters.dateRangeFilter.endYear.value,
+                        filters.dateRangeFilter.endMonth.value,
+                        filters.communitiesListFilter,
+                        filters.crimeListFilter
+                    );
+                } else {
+                    // Process data in total mode
+                    await processTotalData(filters);
                 }
-
-                // Swap coordinates for Leaflet and add crime summaries.
-                const communitiesWithSwappedCoords = crimeSummary.map(communityRecord => ({
-                    ...communityRecord,
-                    boundary: swapGeoJsonCoordinates(communityRecord.boundary)
-                }));
-
-                // Add the array of community boundaries to state.
-                setCommunityBoundary(communitiesWithSwappedCoords);
             } catch (error) {
                 console.error(`Error fetching community: ${error}`);
             } finally {
@@ -71,13 +195,104 @@ export default function CommunityBoundaries() {
             }
         }
 
-        // Run the function outlined above.
         fetchFilteredCommunityData();
     }, [filters]);
 
-    // Set the scale of colours that will exist, from green to red with yellow in the middle.
-    const scale = chroma.scale(['#00ff00', '#ffff00', '#ff0000'])
+    // Scale for total mode - green to red
+    const totalScale = chroma.scale(['#00ff00', '#ffff00', '#ff0000'])
         .domain([0, maxCrime]);
+        
+    const differenceScale = (value) => {
+        // If no change or both values are 0, use blue
+        if (value === 0) return chroma('#2196F3');
+        
+        // Get max absolute value for proper scaling
+        const absMax = Math.max(Math.abs(minDifference), Math.abs(maxDifference));
+        if (absMax === 0) return chroma('#2196F3'); // Handle edge case
+        
+        if (value > 0) {
+            // Positive difference (increase) - use red scale
+            return chroma.scale(['#FFEB3B', '#FF9800', '#F44336'])
+                .domain([0, absMax])(value);
+        } else {
+            // Negative difference (decrease) - use green scale
+            return chroma.scale(['#4CAF50', '#8BC34A', '#CDDC39'])
+                .domain([-absMax, 0])(value);
+        }
+    };
+    
+    // Choose scale based on mode for polygon coloring
+    const getPolygonOptions = (community) => {
+        const isDifferenceMode = filters.dateRangeFilter?.comparisonMode === 'difference';
+        
+        const isZeroCrime = isDifferenceMode && community.totalCrimes === 0 && community.startValue === 0;
+        const color = isZeroCrime 
+            ? chroma('#2196F3').hex() 
+            : isDifferenceMode 
+            ? differenceScale(community.difference).hex() 
+            : totalScale(community.totalCrimes).hex();
+
+        return {
+            color,
+            fillColor: color,
+            fillOpacity: 0.3,
+            weight: 4
+        };
+    };
+
+    // Helper function for difference mode to merge and compare crime data 
+    const prepareDifferenceBreakdown = (community) => {
+        if (!community || !community.crimesByCategory) return [];
+        
+        // Get crime data from the current community ("To" data)
+        const toData = {};
+        community.crimesByCategory.forEach(crime => {
+            if (!toData[crime.category]) {
+                toData[crime.category] = 0;
+            }
+            toData[crime.category] += crime.count;
+        });
+        
+        // Get crime data from the fromDateSummary
+        const fromDateCommunity = fromDateSummary?.find(c => c._id === community._id);
+        const fromData = {};
+        
+        if (fromDateCommunity?.crimesByCategory) {
+            fromDateCommunity.crimesByCategory.forEach(crime => {
+                if (!fromData[crime.category]) {
+                    fromData[crime.category] = 0;
+                }
+                fromData[crime.category] += crime.count;
+            });
+        }
+        
+        // Merge the data for comparison
+        const mergedCategories = new Set([
+            ...Object.keys(fromData),
+            ...Object.keys(toData)
+        ]);
+        
+        // Create combined dataset with differences
+        const comparisonData = Array.from(mergedCategories).map(category => {
+            const fromValue = fromData[category] || 0;
+            const toValue = toData[category] || 0;
+            const difference = toValue - fromValue;
+            const percentChange = fromValue > 0 
+                ? Math.round((difference / fromValue) * 100) 
+                : toValue > 0 ? 100 : 0;
+                
+            return {
+                category,
+                from: fromValue,
+                to: toValue,
+                difference,
+                percentChange
+            };
+        });
+        
+        // Sort by absolute difference (largest changes first)
+        return comparisonData.sort((a, b) => Math.abs(b.difference) - Math.abs(a.difference));
+    };
 
     // Helper function to process crime data for display
     const processAndSummarizeCrimeData = (crimesByCategory) => {
@@ -106,33 +321,101 @@ export default function CommunityBoundaries() {
                 hasBoundaries={communityBoundary.length > 0}
             >
                 {communityBoundary.map((community) => {
-                    // Set the polygon Options. The colour is using the Chroma dependency and calculates based on
-                    // total crimes for a community compared to the community with the most crimes (beltline).
-                    const polygonOptions = {
-                        color: scale(community.totalCrimes).hex(),
-                        fillColor: scale(community.totalCrimes).hex(),
-                        fillOpacity: 0.3,
-                        weight: 4
-                    };
-                    
-                    // Process crime data
+                    const polygonOptions = getPolygonOptions(community);
                     const crimeData = processAndSummarizeCrimeData(community.crimesByCategory);
+                    const isDifferenceMode = filters.dateRangeFilter?.comparisonMode === 'difference';
                     
                     return (
                         <Polygon
-                            // The key passed needs to be unique and will be the name of the community.
                             key={community._id}
-                            // Add pathOptions as calculated above.
                             pathOptions={polygonOptions}
-                            // The position to draw is nested deep in the coordinates field so needs two layers of array reference.
                             positions={community.boundary.coordinates[0][0]}
                         >
                             <Popup className="community-popup">
                                 <div className="community-popup-content">
                                     <h3>{community._id}</h3>
                                     
-                                    {/* Display based on filter conditions */}
-                                    {filters.crimeListFilter?.length === 0 ? (
+                                    {/* Display based on filter conditions and mode */}
+                                    {isDifferenceMode && 'difference' in community ? (
+                                        <>
+                                            <p className="crime-total">
+                                                From Date: <span>{community.startValue}</span>
+                                                &nbsp;&nbsp;To Date: <span>{community.totalCrimes}</span>
+                                            </p>
+                                            <p className={`crime-difference ${
+                                                community.totalCrimes === 0 && community.startValue === 0 
+                                                    ? 'zero-crime' 
+                                                    : community.difference > 0 
+                                                        ? 'increase' 
+                                                        : community.difference < 0 
+                                                            ? 'decrease' 
+                                                            : 'unchanged'
+                                            }`}>
+                                                {community.totalCrimes === 0 && community.startValue === 0 ? (
+                                                    <>No crimes recorded in either period</>
+                                                ) : (
+                                                    <>
+                                                        Change: <span>{community.difference > 0 ? '+' : ''}{community.difference}</span>
+                                                        {community.difference !== 0 && community.startValue > 0 && (
+                                                            <span className="percent-change">
+                                                                ({Math.round((community.difference / community.startValue) * 100)}%)
+                                                            </span>
+                                                        )}
+                                                    </>
+                                                )}
+                                            </p>
+                                            
+                                            {/* Crime breakdown comparison table */}
+                                            <div className="crime-comparison">
+                                                <h4>Crime Comparison:</h4>
+                                                <div className="comparison-table-container">
+                                                    <table className="comparison-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Crime Type</th>
+                                                                <th>From</th>
+                                                                <th>To</th>
+                                                                <th>Change</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {community.crimesByCategory && community.crimesByCategory.length > 0 ? (
+                                                                prepareDifferenceBreakdown(community).map((item, index) => (
+                                                                    <tr key={index} className={
+                                                                        item.difference > 0 
+                                                                            ? 'row-increase' 
+                                                                            : item.difference < 0 
+                                                                                ? 'row-decrease' 
+                                                                                : 'row-unchanged'
+                                                                    }>
+                                                                        <td className="crime-type-cell">{item.category}</td>
+                                                                        <td>{item.from}</td>
+                                                                        <td>{item.to}</td>
+                                                                        <td className="change-cell">
+                                                                            <div className="change-container">
+                                                                                <span className="difference-value">
+                                                                                    {item.difference > 0 ? '+' : ''}{item.difference}
+                                                                                </span>
+                                                                                {item.difference !== 0 && item.from > 0 && (
+                                                                                    <span className="percent-change">
+                                                                                        ({item.percentChange > 0 ? '+' : ''}{item.percentChange}%)
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                ))
+                                                            ) : (
+                                                                <tr>
+                                                                    <td colSpan="4" className="no-data">No crime breakdown available</td>
+                                                                </tr>
+                                                            )}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : filters.crimeListFilter?.length === 0 ? (
                                         <>
                                             <p className="crime-total">Total Crimes: <span>{community.totalCrimes}</span></p>
                                         
@@ -180,10 +463,19 @@ export default function CommunityBoundaries() {
                             </Popup>
                         </Polygon>
                     );
-                })};
+                })}
             </BoundsControl>
 
-            <CrimeColourLegend scale={scale} maxCrime={maxCrime} />
+            <CrimeColourLegend 
+                scale={filters.dateRangeFilter?.comparisonMode === 'difference' ? differenceScale : totalScale} 
+                maxValue={filters.dateRangeFilter?.comparisonMode === 'difference' 
+                    ? Math.max(Math.abs(minDifference), Math.abs(maxDifference)) 
+                    : maxCrime} 
+                minValue={filters.dateRangeFilter?.comparisonMode === 'difference' 
+                    ? -Math.max(Math.abs(minDifference), Math.abs(maxDifference)) 
+                    : 0}
+                mode={filters.dateRangeFilter?.comparisonMode || 'total'}
+            />
         </>
-    )
+    );
 }

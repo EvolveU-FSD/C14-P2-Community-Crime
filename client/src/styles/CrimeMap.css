@@ -1,0 +1,71 @@
+/* Custom positioning for Leaflet controls */
+/* Position zoom controls in bottom right with proper margin to avoid legend */
+.leaflet-control-zoom.leaflet-bar.leaflet-control {
+  margin-right: 20px;
+  margin-bottom: 20px;
+  position: absolute;
+  bottom: 0; /* Ensure it's at the bottom */
+  right: 0; /* Ensure it's at the right */
+}
+
+/* Ensure attribution doesn't overlap with controls */
+.leaflet-control-attribution {
+  margin-right: 80px;
+  padding-right: 60px !important; /* Ensure no overlap with zoom controls */
+  z-index: 700; /* Lower z-index to prevent overlapping with controls */
+}
+
+/* Fix for zoom control positioning on all screen sizes */
+.leaflet-bottom.leaflet-right {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+/* Ensure legend in the left corner doesn't interfere with attribution */
+.leaflet-control-attribution.leaflet-control {
+  margin-left: 270px; /* Give space for the legend on the left */
+}
+
+/* Medium screen adjustments - keep attribution but adjust margins */
+@media (max-width: 768px) {
+  .leaflet-control-zoom.leaflet-bar.leaflet-control {
+    margin-bottom: 30px; /* Larger margin on mobile */
+    z-index: 900; /* Ensure controls stay on top */
+  }
+  
+  /* Adjust attribution for medium screens but keep it visible */
+  .leaflet-control-attribution.leaflet-control {
+    margin-left: 150px; /* Reduced space for smaller screens */
+    margin-right: 60px; /* Give some space from the right edge */
+    font-size: 10px; /* Slightly smaller font */
+    padding: 2px 5px !important;
+  }
+  
+  /* Ensure the LocationButton is properly positioned */
+  .location-button-container {
+    z-index: 900;
+  }
+}
+
+/* Small screen adjustments - hide attribution */
+@media (max-width: 576px) {
+  /* Hide attribution only on phone-sized screens */
+  .leaflet-control-attribution {
+    display: none;
+  }
+}
+
+/* Extra small screens - ensure controls are accessible */
+@media (max-width: 480px) {
+  .leaflet-control-zoom.leaflet-bar.leaflet-control {
+    margin-bottom: 25px;
+    margin-right: 15px;
+  }
+  
+  /* Reposition location button for better access */
+  .location-button-container {
+    bottom: 25px;
+    right: 60px;
+  }
+}

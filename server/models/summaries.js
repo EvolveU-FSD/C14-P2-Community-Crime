@@ -1,4 +1,5 @@
 import { connectDb } from "../db.js";
+import { CommunityBoundary } from "./communityBoundary.js";
 import { CrimeRecord } from "./crimes.js";
 
 const mongoose = await connectDb();
@@ -146,6 +147,92 @@ export async function getCrimesByCommunity(filters) {
     }
 }
 
+// Create a function that will return records for an individual year/month combination for comparison.
+export async function getCrimesByCategorySingleMonthAndYear(year, month, communitiesListFilter, crimeListFilter) {
+    // Build match condition for specific date
+    const matchCondition = {
+        year: parseInt(year),
+        month: parseInt(month)
+    };
+    
+    // Add community filter
+    if (communitiesListFilter?.length > 0) {
+        matchCondition.community = { $in: communitiesListFilter.map(c => c.label) };
+    }
+
+    // Add crime filter
+    if (crimeListFilter?.length > 0) {
+        matchCondition.category = { $in: crimeListFilter.map(c => c.value) };
+    }
+    
+    try {
+        const crimeSummary = await CrimeRecord.aggregate([
+            {
+                $match: matchCondition
+            },
+            {
+                $group: {
+                    _id: "$community",
+                    totalCrimes: { $sum: "$crimeCount" },
+                    crimesByCategory: {
+                        $push: {
+                            category: "$category",
+                            count: "$crimeCount"
+                        }
+                    }
+                }
+            },
+            {
+                // Add a lookup to join with community boundaries
+                $lookup: {
+                    from: "communityBoundaries",
+                    let: { communityName: "$_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: ["$name", "$$communityName"]
+                                }
+                            }
+                        },
+                        {
+                            $project: {
+                                _id: 1,
+                                name: 1,
+                                sector: 1,
+                                commCode: 1,
+                                boundary: 1
+                            }
+                        }
+                    ],
+                    as: "communityInfo"
+                }
+            },
+            {
+                $unwind: "$communityInfo"
+            },
+            {
+                $project: {
+                    _id: 1,
+                    totalCrimes: 1,
+                    crimesByCategory: 1,
+                    sector: "$communityInfo.sector",
+                    commCode: "$communityInfo.commCode",
+                    boundary: "$communityInfo.boundary"
+                }
+            },
+            {
+                $sort: { totalCrimes: -1 }
+            }
+        ]);
+
+        return crimeSummary;
+    } catch (error) {
+        console.error(`Error in getCrimesByCategorySingleMonthAndYear: ${error}`);
+        throw error;
+    }
+}
+
 // Similar to the function above, this one instead gets information just for one community
 // that is passed in and gets the summary. This will be good for individual information pages and stats.
 export async function getCrimesByCategoryAndCommunity(community) {
@@ -198,6 +285,50 @@ export async function getCrimesByCommunityAndYear() {
         return crimeSummary;
     } catch (error) {
         console.error(`Error in getCrimesByCommunityAndYear: ${error}`);
+        throw error;
+    }
+}
+
+// Find the community that contains a given latitude/longitude point
+export async function getCommunityByLocation(latitude, longitude) {
+    try {
+        if (!latitude || !longitude) {
+            throw new Error('Latitude and longitude are required');
+        }
+        
+        // Create a GeoJSON point
+        const point = {
+            type: "Point",
+            coordinates: [longitude, latitude] // GeoJSON uses [longitude, latitude] order
+        };
+        
+        // Query for a community that contains this point
+        const community = await CommunityBoundary.findOne({
+            boundary: {
+                $geoIntersects: {
+                    $geometry: point
+                }
+            }
+        });
+        
+        if (community) {
+            return {
+                success: true,
+                community: {
+                    _id: community._id,
+                    name: community.name,
+                    commCode: community.commCode,
+                    sector: community.sector
+                }
+            };
+        } else {
+            return {
+                success: false,
+                message: "No community found at this location"
+            };
+        }
+    } catch (error) {
+        console.error(`Error in getCommunityByLocation: ${error}`);
         throw error;
     }
 }

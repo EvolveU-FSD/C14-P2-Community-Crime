@@ -23,7 +23,7 @@ const communityBoundarySchema = mongoose.Schema({
 
 communityBoundarySchema.index({ boundary: '2dsphere' });
 
-const CommunityBoundary = mongoose.model('communityBoundary', communityBoundarySchema, 'communityBoundaries');
+export const CommunityBoundary = mongoose.model('communityBoundary', communityBoundarySchema, 'communityBoundaries');
 
 // Create a new record
 export async function createCommunityBoundary(

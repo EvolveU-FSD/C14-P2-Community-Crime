@@ -1,0 +1,267 @@
+.community-popup-content {
+  min-width: 250px;
+  max-width: 350px;
+  font-family: Arial, sans-serif;
+  padding-right: 5px; /* Add padding for scrollbar */
+}
+
+.community-popup-content h3 {
+  margin: 0 0 10px 0;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #eee;
+  font-size: 16px;
+  color: #333;
+}
+
+.crime-total {
+  font-size: 14px;
+  margin: 5px 0;
+  padding-bottom: 5px;
+  border-bottom: 1px dotted #eee;
+}
+
+.crime-total span {
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+.crime-breakdown {
+  margin-top: 10px;
+  position: relative;
+}
+
+.crime-breakdown h4 {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #555;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.crime-breakdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 5px 0 0 0;
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 5px 10px 5px 5px; /* Right padding for scrollbar */
+  scrollbar-width: thin; /* For Firefox */
+}
+
+.crime-breakdown li {
+  margin-bottom: 5px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dotted #eee;
+  padding-bottom: 3px;
+}
+
+.crime-type {
+  max-width: 75%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 10px;
+}
+
+.crime-count {
+  font-weight: bold;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.community-sector {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #777;
+  font-style: italic;
+}
+
+/* Style for scrollbar in crime list */
+.crime-breakdown ul::-webkit-scrollbar {
+  width: 8px;
+}
+
+.crime-breakdown ul::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.crime-breakdown ul::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+  border: 2px solid #f5f5f5;
+}
+
+.crime-breakdown ul::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+.crime-breakdown {
+  position: relative;
+}
+
+/* Add fade at the bottom to indicate more content as a fixed overlay */
+.crime-breakdown::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 8px; /* Account for scrollbar width */
+  height: 20px;
+  background: linear-gradient(transparent, rgba(255,255,255,0.9));
+  pointer-events: none;
+  z-index: 1; /* Ensure it's above the list */
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.crime-breakdown:hover::after {
+  opacity: 1;
+}
+
+.crime-difference {
+  font-size: 14px;
+  margin: 5px 0;
+  padding: 5px;
+  border-radius: 3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.crime-difference.increase {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #d32f2f;
+}
+
+.crime-difference.decrease {
+  background-color: rgba(76, 175, 80, 0.1);
+  color: #388e3c;
+}
+
+.crime-difference.unchanged {
+  background-color: rgba(33, 150, 243, 0.1);
+  color: #1976d2;
+}
+
+.crime-difference.zero-crime {
+  background-color: rgba(33, 150, 243, 0.1);
+  color: #1976d2;
+  text-align: center;
+  font-style: italic;
+}
+
+.crime-difference span {
+  font-weight: bold;
+}
+
+.percent-change {
+  font-size: 12px;
+  margin-left: 5px;
+  opacity: 0.8;
+}
+
+/* Add these styles for the comparison table and percentage display */
+
+/* Fix the percent-change display for scrollable tables */
+.crime-comparison .comparison-table-container {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  margin-top: 5px;
+  scrollbar-width: thin;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  table-layout: fixed; /* Fixed layout for better control */
+}
+
+.comparison-table th {
+  position: sticky;
+  top: 0;
+  background-color: #f5f5f5;
+  padding: 5px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  font-weight: bold;
+  z-index: 10; /* Ensure header stays above scrolling content */
+}
+
+.comparison-table td {
+  padding: 4px 5px;
+  border-bottom: 1px dotted #eee;
+  vertical-align: top; /* Align to top to handle multi-line content */
+}
+
+/* Make sure the crime type column is wide enough */
+.comparison-table th:first-child,
+.comparison-table td:first-child {
+  width: 40%;
+}
+
+/* Ensure the change column is wide enough for both the number and percentage */
+.comparison-table th:last-child,
+.comparison-table td:last-child {
+  width: 25%;
+}
+
+/* Container for change value and percentage to keep them together */
+.change-container {
+  display: inline-block; /* Keep it in the text flow */
+  white-space: nowrap; /* Keep number and percentage together */
+  max-width: 100%; /* Prevent overflow */
+  overflow: hidden; /* Hide overflow content */
+  text-overflow: ellipsis; /* Show ellipsis for overflow */
+}
+
+.difference-value {
+  font-weight: bold;
+}
+
+.percent-change {
+  font-size: 11px;
+  color: #666;
+  margin-left: 2px;
+  white-space: nowrap;
+}
+
+/* Style for row colors */
+.comparison-table tr.row-increase {
+  background-color: rgba(244, 67, 54, 0.1);
+}
+
+.comparison-table tr.row-decrease {
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+.comparison-table tr.row-unchanged {
+  background-color: rgba(33, 150, 243, 0.1);
+}
+
+.comparison-table .row-increase .change-cell {
+  color: #d32f2f;
+}
+
+.comparison-table .row-decrease .change-cell {
+  color: #388e3c;
+}
+
+.comparison-table .row-unchanged .change-cell {
+  color: #1976d2;
+}
+
+.comparison-table .no-data {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  padding: 10px;
+}

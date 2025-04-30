@@ -1,42 +1,135 @@
-.date-filter-container {
-  position: absolute;
-  top: 140px;
-  right: 20px;
-  width: 400px;
-  background-color: white;
-  padding: 10px;
-  border-radius: 4px;
-  box-shadow: 0 1px 5px rgba(0,0,0,0.4);
-  z-index: 997;
+.date-range-content {
+  width: 100%;
+}
+
+/* New header with title and radio buttons side by side */
+.date-range-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px; /* Reduced from 10px */
+}
+
+.date-range-title {
+  font-size: 0; /* Hide visually but maintain in the structure */
+  color: transparent;
 }
 
 .date-filter-section {
-  margin-bottom: 10px;
+  margin-bottom: 8px; /* Reduced from 10px */
+}
+
+/* Add special class for the last section */
+.last-filter-section {
+  margin-bottom: 0; /* Remove bottom margin from last item */
 }
 
 .date-filter-label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 3px; /* Reduced from 5px */
   font-size: 14px;
-  font-weight: bold;
   color: #333;
 }
 
 .date-filter-inputs {
   display: flex;
-  gap: 10px;
+  gap: 8px; /* Reduced from 10px */
 }
 
+/* Adjust the width proportions of year and month selects */
 .year-select {
-  width: 40%;
+  width: 45%; /* Increased from 40% to give more room for year + clear button */
+  min-width: 90px; /* Ensure minimum width for the year + clear button */
 }
 
 .month-select {
-  width: 60%;
+  width: 55%; /* Reduced from 60% */
+  min-width: 110px; /* Ensure minimum width for the longest month name */
 }
 
+/* Add extra space for the clear button in the year select */
+.date-select__clear-indicator {
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+/* Make the year value container slightly more compact */
+.year-select .date-select__value-container {
+  padding-left: 6px;
+  padding-right: 0;
+}
+
+/* Radio button styling */
+.radio-group {
+  display: flex;
+  gap: 10px; /* Reduced from 15px */
+  align-items: center;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  font-size: 13px; /* Reduced from 14px */
+  color: #555;
+  cursor: pointer;
+  padding: 0; /* Remove extra padding */
+}
+
+.radio-label input {
+  margin-right: 3px; /* Reduced from 5px */
+  min-width: 14px; /* Reduced from 16px */
+  min-height: 14px; /* Reduced from 16px */
+}
+
+/* Override FilterPanel styles to remove extra padding */
+.filter-section:last-child {
+  margin-bottom: 5px !important; /* Override FilterPanel styles */
+  padding-bottom: 0 !important; /* Override FilterPanel styles */
+}
+
+/* Adjust React Select components for tighter UI */
+.date-select__control {
+  min-height: 32px !important;
+}
+
+.date-select__indicators {
+  padding: 0 4px !important;
+}
+
+.date-select__value-container {
+  padding: 0 6px !important;
+}
+
+.date-select__input-container {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Mobile adjustments */
 @media (max-width: 768px) {
-  .date-filter-container {
-    width: 300px;
+  .radio-label {
+    font-size: 12px;
+  }
+  
+  .radio-group {
+    gap: 6px;
+  }
+}
+
+/* Additional responsive handling for very small screens */
+@media (max-width: 400px) {
+  .date-filter-inputs {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .year-select,
+  .month-select {
+    width: 100%;
+  }
+  
+  /* Ensure the year select has enough room for the clear button on mobile */
+  .year-select .date-select__control {
+    min-height: 32px;
   }
 }
