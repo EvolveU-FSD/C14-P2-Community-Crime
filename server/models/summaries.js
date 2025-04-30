@@ -98,7 +98,7 @@ export async function getCrimesByCommunity(filters) {
                         {
                             $match: {
                                 $expr: {
-                                    $eq: ["$commCode", "$$communityName"]
+                                    $eq: ["$name", "$$communityName"]
                                 }
                             }
                         },
