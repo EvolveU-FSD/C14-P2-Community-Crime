@@ -119,6 +119,8 @@ export async function findCommunityBoundaryById(id) {
 export async function getCommunityBoundaryList() {
     try {
         const communityBoundaryListFull = await CommunityBoundary.find({}).sort({ name: 1, commCode: 1 });
+        // Add this to inspect how the names look 
+        communityBoundaryListFull.forEach(c => console.log(`[${c.name}]`));
         const communityBoundaryList = communityBoundaryListFull.map(community => ({
             value: community.commCode,
             label: community.name
