@@ -1,4 +1,5 @@
 import { connectDb } from "../db.js";
+import { CommunityBoundary } from "./communityBoundary.js";
 import { CrimeRecord } from "./crimes.js";
 
 const mongoose = await connectDb();
@@ -284,6 +285,50 @@ export async function getCrimesByCommunityAndYear() {
         return crimeSummary;
     } catch (error) {
         console.error(`Error in getCrimesByCommunityAndYear: ${error}`);
+        throw error;
+    }
+}
+
+// Find the community that contains a given latitude/longitude point
+export async function getCommunityByLocation(latitude, longitude) {
+    try {
+        if (!latitude || !longitude) {
+            throw new Error('Latitude and longitude are required');
+        }
+        
+        // Create a GeoJSON point
+        const point = {
+            type: "Point",
+            coordinates: [longitude, latitude] // GeoJSON uses [longitude, latitude] order
+        };
+        
+        // Query for a community that contains this point
+        const community = await CommunityBoundary.findOne({
+            boundary: {
+                $geoIntersects: {
+                    $geometry: point
+                }
+            }
+        });
+        
+        if (community) {
+            return {
+                success: true,
+                community: {
+                    _id: community._id,
+                    name: community.name,
+                    commCode: community.commCode,
+                    sector: community.sector
+                }
+            };
+        } else {
+            return {
+                success: false,
+                message: "No community found at this location"
+            };
+        }
+    } catch (error) {
+        console.error(`Error in getCommunityByLocation: ${error}`);
         throw error;
     }
 }
