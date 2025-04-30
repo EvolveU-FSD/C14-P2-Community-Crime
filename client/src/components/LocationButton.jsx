@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useMap, Marker } from 'react-leaflet';
 import { useFilters } from '../context/FilterContext';
 import L from 'leaflet';
@@ -39,7 +39,7 @@ export default function LocationButton() {
   useEffect(() => {
     let errorTimer;
     if (showError) {
-      errorTimer = setTimeout(() => setShowError(false), 5000);
+      errorTimer = setTimeout(() => setShowError(false), 10000);
     }
     return () => clearTimeout(errorTimer);
   }, [showError]);
@@ -59,11 +59,85 @@ export default function LocationButton() {
     };
   }, [showMarker, userLocation]);
 
-  const handleFindMyLocation = () => {
+  // Process the location and find the community
+  const processLocation = useCallback(async (latitude, longitude) => {
+    try {
+      // Check which community contains this location
+      const response = await fetch('/api/getCommunityByLocation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ latitude, longitude })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to determine your community');
+      }
+      
+      const data = await response.json();
+      
+      // Set user location to show marker
+      setUserLocation([latitude, longitude]);
+      setShowMarker(true);
+      
+      // Fly to the location
+      map.flyTo([latitude, longitude], 15, {
+        animate: true,
+        duration: 1
+      });
+      
+      if (data.success && data.community) {
+        // Found the community - set it in filters
+        setFilters(prev => ({
+          ...prev,
+          communitiesListFilter: [{
+            value: data.community.commCode,
+            label: data.community.name
+          }]
+        }));
+      } else {
+        setError('Your location is not within any Calgary community boundary');
+        setShowError(true);
+      }
+    } catch (err) {
+      console.error('Error finding community:', err);
+      setError(err.message || 'Failed to find your community');
+      setShowError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [map, setFilters]);
+
+  // Handle geolocation errors
+  const handleGeolocationError = useCallback((err) => {
+    console.error('Geolocation error:', err);
+    let errorMessage = 'Unable to determine your location';
+    
+    switch(err.code) {
+      case 1: // PERMISSION_DENIED
+        errorMessage = 'Location access denied. Please enable location services.';
+        break;
+      case 2: // POSITION_UNAVAILABLE
+        errorMessage = 'Your location is currently unavailable.';
+        break;
+      case 3: // TIMEOUT
+        errorMessage = 'Location request timed out.';
+        break;
+      default:
+        errorMessage = `Geolocation error: ${err.message}`;
+    }
+    
+    setError(errorMessage);
+    setShowError(true);
+    setIsLoading(false);
+  }, []);
+
+  // Main function to get user location
+  const handleFindMyLocation = useCallback(() => {
     setIsLoading(true);
     setError(null);
     setShowError(false);
     setShowMarker(false);
+    setUserLocation(null);
     
     if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser');
@@ -72,97 +146,23 @@ export default function LocationButton() {
       return;
     }
     
+    // Get the current position
     navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          const { latitude, longitude } = position.coords;
-          
-          // First, check which community contains this location
-          const response = await fetch('/api/getCommunityByLocation', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ latitude, longitude })
-          });
-          
-          if (!response.ok) {
-            throw new Error('Failed to determine your community');
-          }
-          
-          const data = await response.json();
-          console.log('API response:', data);
-          
-          if (data.success && data.community) {
-            console.log('Found community:', data.community);
-            
-            // Set user location to show marker
-            setUserLocation([latitude, longitude]);
-            setShowMarker(true);
-            
-            // Fly to the location
-            map.flyTo([latitude, longitude], 15, {
-              animate: true,
-              duration: 1
-            });
-            
-            // Found the community - set it in filters
-            setFilters(prev => ({
-              ...prev,
-              communitiesListFilter: [{
-                value: data.community.commCode,
-                label: data.community.name
-              }]
-            }));
-          } else {
-            setError('Your location is not within any Calgary community boundary');
-            setShowError(true);
-            
-            // Still show the location even if not in a community
-            setUserLocation([latitude, longitude]);
-            setShowMarker(true);
-            
-            // Fly to the location anyway
-            map.flyTo([latitude, longitude], 15, {
-              animate: true, 
-              duration: 1
-            });
-          }
-        } catch (err) {
-          console.error('Error finding community:', err);
-          setError(err.message || 'Failed to find your community');
-          setShowError(true);
-        } finally {
-          setIsLoading(false);
-        }
+      // Success callback - just extract coordinates and process them
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        processLocation(latitude, longitude);
       },
-      (err) => {
-        console.error('Geolocation error:', err);
-        let errorMessage = 'Unable to determine your location';
-        
-        switch(err.code) {
-          case 1: // PERMISSION_DENIED
-            errorMessage = 'Location access denied. Please enable location services.';
-            break;
-          case 2: // POSITION_UNAVAILABLE
-            errorMessage = 'Your location is currently unavailable.';
-            break;
-          case 3: // TIMEOUT
-            errorMessage = 'Location request timed out.';
-            break;
-          default:
-            errorMessage = `Geolocation error: ${err.message}`;
-        }
-        
-        setError(errorMessage);
-        setShowError(true);
-        setIsLoading(false);
-      },
+      // Error callback
+      handleGeolocationError,
+      // Options
       {
         enableHighAccuracy: true,
         timeout: 10000,
         maximumAge: 0
       }
     );
-  };
+  }, [processLocation, handleGeolocationError]);
 
   return (
     <>
