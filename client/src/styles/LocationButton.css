@@ -61,14 +61,16 @@
   right: 0;
   background-color: rgba(224, 67, 67, 0.9);
   color: white;
-  padding: 8px 12px;
+  padding: 10px 14px; 
   border-radius: 4px;
   font-size: 13px;
-  white-space: nowrap;
-  max-width: 250px;
+  white-space: normal; 
+  max-width: 300px; 
+  min-width: 200px; 
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   animation: fadeInOut 0.3s ease-in-out;
   z-index: 801;
+  line-height: 1.4; 
 }
 
 @keyframes fadeInOut {
@@ -120,6 +122,16 @@
   
   .location-error {
     font-size: 12px;
-    padding: 6px 10px;
+    padding: 8px 12px;
+    max-width: 250px; /* Slightly smaller on mobile */
+    min-width: 150px;
+    right: -45px; /* Adjust positioning on mobile to center better */
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .location-error {
+    right: -65px; /* Further adjust positioning on very small screens */
   }
 }
