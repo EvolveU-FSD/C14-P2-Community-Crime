@@ -4,7 +4,7 @@ import { Polygon, Popup } from 'react-leaflet';
 import chroma from "chroma-js";
 import BoundsControl from "./BoundsControl";
 import CrimeColourLegend from "./CrimeColourLegend";
-import "../style/CommunityPopup.css";
+import "../styles/CommunityPopup.css";
 
 export default function CommunityBoundaries() {
     const { filters } = useFilters();
@@ -392,12 +392,16 @@ export default function CommunityBoundaries() {
                                                                         <td>{item.from}</td>
                                                                         <td>{item.to}</td>
                                                                         <td className="change-cell">
-                                                                            {item.difference > 0 ? '+' : ''}{item.difference}
-                                                                            {item.difference !== 0 && item.from > 0 && (
-                                                                                <span className="percent-change">
-                                                                                    ({item.percentChange > 0 ? '+' : ''}{item.percentChange}%)
+                                                                            <div className="change-container">
+                                                                                <span className="difference-value">
+                                                                                    {item.difference > 0 ? '+' : ''}{item.difference}
                                                                                 </span>
-                                                                            )}
+                                                                                {item.difference !== 0 && item.from > 0 && (
+                                                                                    <span className="percent-change">
+                                                                                        ({item.percentChange > 0 ? '+' : ''}{item.percentChange}%)
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
                                                                         </td>
                                                                     </tr>
                                                                 ))

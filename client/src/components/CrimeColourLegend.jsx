@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import '../style/CrimeColourLegend.css';
+import '../styles/CrimeColourLegend.css';
 
 export default function CrimeColourLegend({ scale, maxValue, minValue = 0, mode = 'total' }) {
   const [legendSteps, setLegendSteps] = useState([]);

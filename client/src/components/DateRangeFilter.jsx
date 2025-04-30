@@ -379,6 +379,10 @@ export default function DateRangeFilter() {
             options={yearOptions}
             isClearable={!isDifferenceMode}
             isLoading={loading}
+            menuPortalTarget={document.body}
+            styles={{
+              menuPortal: base => ({ ...base, zIndex: 9999 }),
+            }}
             classNamePrefix="date-select"
           />
           <Select
@@ -390,6 +394,10 @@ export default function DateRangeFilter() {
             isDisabled={!filters.dateRangeFilter?.startYear || loading}
             isClearable={!isDifferenceMode}
             isLoading={loading}
+            menuPortalTarget={document.body}
+            styles={{
+              menuPortal: base => ({ ...base, zIndex: 9999 }),
+            }}
             classNamePrefix="date-select"
           />
         </div>
@@ -406,6 +414,10 @@ export default function DateRangeFilter() {
             options={endYearOptions}
             isClearable={!isDifferenceMode}
             isLoading={loading}
+            menuPortalTarget={document.body}
+            styles={{
+              menuPortal: base => ({ ...base, zIndex: 9999 }),
+            }}
             classNamePrefix="date-select"
           />
           <Select
@@ -417,6 +429,10 @@ export default function DateRangeFilter() {
             isDisabled={!filters.dateRangeFilter?.endYear || loading}
             isClearable={!isDifferenceMode}
             isLoading={loading}
+            menuPortalTarget={document.body}
+            styles={{
+              menuPortal: base => ({ ...base, zIndex: 9999 }),
+            }}
             classNamePrefix="date-select"
           />
         </div>

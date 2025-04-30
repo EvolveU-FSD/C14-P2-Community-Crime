@@ -1,5 +1,5 @@
 import FilterProvider from './context/FilterContext';
-import './style/App.css';
+import './styles/App.css';
 import CrimeMap from './components/CrimeMap';
 import Logo from './components/Logo';
 import FilterPanel from './components/FilterPanel';
