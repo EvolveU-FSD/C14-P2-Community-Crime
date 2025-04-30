@@ -1,15 +1,16 @@
+/* Position the location button to the left of the zoom controls */
 .location-button-container {
   position: absolute;
-  bottom: 105px;
-  right: 10px;
+  bottom: 20px; 
+  right: 65px; 
   z-index: 800;
 }
 
 .location-button {
-  width: 34px;
-  height: 34px;
+  width: 30px; 
+  height: 30px;
   background-color: white;
-  border: 2px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   display: flex;
   align-items: center;
@@ -30,6 +31,8 @@
 
 .location-button svg {
   fill: #444;
+  width: 16px;
+  height: 16px;
 }
 
 .location-button.loading {
@@ -38,8 +41,8 @@
 }
 
 .spinner {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   border: 2px solid rgba(0, 0, 0, 0.1);
   border-top-color: #007bff;
@@ -111,7 +114,8 @@
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .location-button-container {
-    bottom: 90px;
+    bottom: 20px;
+    right: 65px;
   }
   
   .location-error {
