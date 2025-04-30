@@ -48,6 +48,10 @@ export default function CrimeFilterMultiSelect() {
       components={animatedComponents}
       onChange={handleChange}
       isMulti
+      menuPortalTarget={document.body}
+      styles={{
+        menuPortal: base => ({ ...base, zIndex: 9999 }),
+      }}
       placeholder="Filter by crime"
       options={crimeTypeList}
       value={filters.crimeListFilter}
