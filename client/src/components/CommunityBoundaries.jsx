@@ -4,7 +4,7 @@ import { Polygon, Popup } from 'react-leaflet';
 import chroma from "chroma-js";
 import BoundsControl from "./BoundsControl";
 import CrimeColourLegend from "./CrimeColourLegend";
-import "../style/CommunityPopup.css";
+import "../styles/CommunityPopup.css";
 
 export default function CommunityBoundaries() {
     const { filters } = useFilters();
@@ -225,34 +225,19 @@ export default function CommunityBoundaries() {
     const getPolygonOptions = (community) => {
         const isDifferenceMode = filters.dateRangeFilter?.comparisonMode === 'difference';
         
-        if (isDifferenceMode && 'difference' in community) {
-            // Special case for communities with zero crime in both periods
-            if (community.totalCrimes === 0 && community.startValue === 0) {
-                const color = chroma('#2196F3').hex(); // Blue for communities with zero crime in both periods
-                return {
-                    color,
-                    fillColor: color,
-                    fillOpacity: 0.3,
-                    weight: 4
-                };
-            }
-            
-            const color = differenceScale(community.difference).hex();
-            return {
-                color,
-                fillColor: color,
-                fillOpacity: 0.3,
-                weight: 4
-            };
-        } else {
-            const color = totalScale(community.totalCrimes).hex();
-            return {
-                color,
-                fillColor: color,
-                fillOpacity: 0.3,
-                weight: 4
-            };
-        }
+        const isZeroCrime = isDifferenceMode && community.totalCrimes === 0 && community.startValue === 0;
+        const color = isZeroCrime 
+            ? chroma('#2196F3').hex() 
+            : isDifferenceMode 
+            ? differenceScale(community.difference).hex() 
+            : totalScale(community.totalCrimes).hex();
+
+        return {
+            color,
+            fillColor: color,
+            fillOpacity: 0.3,
+            weight: 4
+        };
     };
 
     // Helper function for difference mode to merge and compare crime data 
@@ -407,12 +392,16 @@ export default function CommunityBoundaries() {
                                                                         <td>{item.from}</td>
                                                                         <td>{item.to}</td>
                                                                         <td className="change-cell">
-                                                                            {item.difference > 0 ? '+' : ''}{item.difference}
-                                                                            {item.difference !== 0 && item.from > 0 && (
-                                                                                <span className="percent-change">
-                                                                                    ({item.percentChange > 0 ? '+' : ''}{item.percentChange}%)
+                                                                            <div className="change-container">
+                                                                                <span className="difference-value">
+                                                                                    {item.difference > 0 ? '+' : ''}{item.difference}
                                                                                 </span>
-                                                                            )}
+                                                                                {item.difference !== 0 && item.from > 0 && (
+                                                                                    <span className="percent-change">
+                                                                                        ({item.percentChange > 0 ? '+' : ''}{item.percentChange}%)
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
                                                                         </td>
                                                                     </tr>
                                                                 ))
