@@ -2,7 +2,7 @@ import React from 'react';
 import { MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import CommunityBoundaries from "./CommunityBoundaries";
-import '../style/CrimeMap.css'; // Import the custom map styles
+import '../styles/CrimeMap.css'; // Import the custom map styles
 
 export default function CrimeMap () {
   return (
