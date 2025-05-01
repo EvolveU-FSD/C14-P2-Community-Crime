@@ -1,3 +1,11 @@
+:root {
+  --neutral-color: #9E9E9E;
+  --positive-light: #81C784;
+  --positive-strong: #1E88E5;
+  --negative-light: #FDD835;
+  --negative-strong: #D32F2F;
+}
+
 .community-popup-content {
   min-width: 250px;
   max-width: 350px;
@@ -134,19 +142,16 @@
   align-items: center;
 }
 
+.crime-difference.unchanged {
+  color: var(--neutral-color);
+}
+
 .crime-difference.increase {
-  background-color: rgba(244, 67, 54, 0.1);
-  color: #d32f2f;
+  color: var(--negative-strong);
 }
 
 .crime-difference.decrease {
-  background-color: rgba(76, 175, 80, 0.1);
-  color: #388e3c;
-}
-
-.crime-difference.unchanged {
-  background-color: rgba(33, 150, 243, 0.1);
-  color: #1976d2;
+  color: var(--positive-strong);
 }
 
 .crime-difference.zero-crime {
@@ -236,15 +241,15 @@
 
 /* Style for row colors */
 .comparison-table tr.row-increase {
-  background-color: rgba(244, 67, 54, 0.1);
+  background-color: rgba(211, 47, 47, 0.1); /* --negative-strong with transparency */
 }
 
 .comparison-table tr.row-decrease {
-  background-color: rgba(76, 175, 80, 0.1);
+  background-color: rgba(30, 136, 229, 0.1); /* --positive-strong with transparency */
 }
 
 .comparison-table tr.row-unchanged {
-  background-color: rgba(33, 150, 243, 0.1);
+  background-color: rgba(158, 158, 158, 0.1); /* --neutral-color with transparency */
 }
 
 .comparison-table .row-increase .change-cell {

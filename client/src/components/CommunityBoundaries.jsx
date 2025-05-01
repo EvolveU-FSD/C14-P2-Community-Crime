@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useFilters } from "../context/FilterContext";
+import { useColorTheme } from "../context/ColorThemeContext";
 import { Polygon, Popup } from 'react-leaflet';
 import chroma from "chroma-js";
 import BoundsControl from "./BoundsControl";
@@ -7,15 +8,19 @@ import CrimeColourLegend from "./CrimeColourLegend";
 import "../styles/CommunityPopup.css";
 
 export default function CommunityBoundaries() {
+    // Get the color theme from context
+    const colorTheme = useColorTheme();
+    const { totalScale, increaseScale, decreaseScale } = colorTheme.getScaleColors();
+    
     const { filters } = useFilters();
     const [communityBoundary, setCommunityBoundary] = useState([]);
     const [maxCrime, setMaxCrime] = useState(0);
     const [maxDifference, setMaxDifference] = useState(0);
     const [minDifference, setMinDifference] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
-    const [currentData, setCurrentData] = useState({}); 
-    const [startData, setStartData] = useState({}); 
-    const [fromDateSummary, setFromDateSummary] = useState([]); 
+    const [currentData, setCurrentData] = useState({});
+    const [startData, setStartData] = useState({});
+    const [fromDateSummary, setFromDateSummary] = useState([]);
 
     // Build a reusable function that may be extracted out for leaflet usable coordinates.
     function swapGeoJsonCoordinates(geojson) {
@@ -198,25 +203,25 @@ export default function CommunityBoundaries() {
         fetchFilteredCommunityData();
     }, [filters]);
 
-    // Scale for total mode - green to red
-    const totalScale = chroma.scale(['#00ff00', '#ffff00', '#ff0000'])
+    // Update scale functions to use the theme colors
+    const totalScaleFunction = chroma.scale(totalScale)
         .domain([0, maxCrime]);
         
-    const differenceScale = (value) => {
-        // If no change or both values are 0, use blue
-        if (value === 0) return chroma('#2196F3');
+    const differenceScaleFunction = (value) => {
+        // If no change or both values are 0, use neutral color
+        if (value === 0) return chroma(colorTheme.neutralChangeColor);
         
         // Get max absolute value for proper scaling
         const absMax = Math.max(Math.abs(minDifference), Math.abs(maxDifference));
-        if (absMax === 0) return chroma('#2196F3'); // Handle edge case
+        if (absMax === 0) return chroma(colorTheme.neutralChangeColor); // Handle edge case
         
         if (value > 0) {
-            // Positive difference (increase) - use red scale
-            return chroma.scale(['#FFEB3B', '#FF9800', '#F44336'])
+            // Positive difference (increase) - use negative scale (red)
+            return chroma.scale(increaseScale)
                 .domain([0, absMax])(value);
         } else {
-            // Negative difference (decrease) - use green scale
-            return chroma.scale(['#4CAF50', '#8BC34A', '#CDDC39'])
+            // Negative difference (decrease) - use positive scale (blue)
+            return chroma.scale(decreaseScale)
                 .domain([-absMax, 0])(value);
         }
     };
@@ -227,19 +232,19 @@ export default function CommunityBoundaries() {
         
         const isZeroCrime = isDifferenceMode && community.totalCrimes === 0 && community.startValue === 0;
         const color = isZeroCrime 
-            ? chroma('#2196F3').hex() 
+            ? chroma(colorTheme.neutralChangeColor).hex() 
             : isDifferenceMode 
-            ? differenceScale(community.difference).hex() 
-            : totalScale(community.totalCrimes).hex();
+            ? differenceScaleFunction(community.difference).hex() 
+            : totalScaleFunction(community.totalCrimes).hex();
 
         return {
             color,
             fillColor: color,
-            fillOpacity: 0.3,
-            weight: 4
+            fillOpacity: 0.5,
+            weight: 2.5
         };
     };
-
+    
     // Helper function for difference mode to merge and compare crime data 
     const prepareDifferenceBreakdown = (community) => {
         if (!community || !community.crimesByCategory) return [];
@@ -325,6 +330,11 @@ export default function CommunityBoundaries() {
                     const crimeData = processAndSummarizeCrimeData(community.crimesByCategory);
                     const isDifferenceMode = filters.dateRangeFilter?.comparisonMode === 'difference';
                     
+                    // Get appropriate CSS class for difference styling
+                    const changeClass = community.totalCrimes === 0 && community.startValue === 0 
+                        ? 'zero-crime' 
+                        : colorTheme.getChangeClass(community.difference);
+                    
                     return (
                         <Polygon
                             key={community._id}
@@ -342,15 +352,7 @@ export default function CommunityBoundaries() {
                                                 From Date: <span>{community.startValue}</span>
                                                 &nbsp;&nbsp;To Date: <span>{community.totalCrimes}</span>
                                             </p>
-                                            <p className={`crime-difference ${
-                                                community.totalCrimes === 0 && community.startValue === 0 
-                                                    ? 'zero-crime' 
-                                                    : community.difference > 0 
-                                                        ? 'increase' 
-                                                        : community.difference < 0 
-                                                            ? 'decrease' 
-                                                            : 'unchanged'
-                                            }`}>
+                                            <p className={`crime-difference ${changeClass}`}>
                                                 {community.totalCrimes === 0 && community.startValue === 0 ? (
                                                     <>No crimes recorded in either period</>
                                                 ) : (
@@ -365,7 +367,7 @@ export default function CommunityBoundaries() {
                                                 )}
                                             </p>
                                             
-                                            {/* Crime breakdown comparison table */}
+                                            {/* Comparison table with consistent color classes */}
                                             <div className="crime-comparison">
                                                 <h4>Crime Comparison:</h4>
                                                 <div className="comparison-table-container">
@@ -381,13 +383,7 @@ export default function CommunityBoundaries() {
                                                         <tbody>
                                                             {community.crimesByCategory && community.crimesByCategory.length > 0 ? (
                                                                 prepareDifferenceBreakdown(community).map((item, index) => (
-                                                                    <tr key={index} className={
-                                                                        item.difference > 0 
-                                                                            ? 'row-increase' 
-                                                                            : item.difference < 0 
-                                                                                ? 'row-decrease' 
-                                                                                : 'row-unchanged'
-                                                                    }>
+                                                                    <tr key={index} className={`row-${colorTheme.getChangeClass(item.difference)}`}>
                                                                         <td className="crime-type-cell">{item.category}</td>
                                                                         <td>{item.from}</td>
                                                                         <td>{item.to}</td>
@@ -467,7 +463,7 @@ export default function CommunityBoundaries() {
             </BoundsControl>
 
             <CrimeColourLegend 
-                scale={filters.dateRangeFilter?.comparisonMode === 'difference' ? differenceScale : totalScale} 
+                scale={filters.dateRangeFilter?.comparisonMode === 'difference' ? differenceScaleFunction : totalScaleFunction} 
                 maxValue={filters.dateRangeFilter?.comparisonMode === 'difference' 
                     ? Math.max(Math.abs(minDifference), Math.abs(maxDifference)) 
                     : maxCrime} 
@@ -475,6 +471,7 @@ export default function CommunityBoundaries() {
                     ? -Math.max(Math.abs(minDifference), Math.abs(maxDifference)) 
                     : 0}
                 mode={filters.dateRangeFilter?.comparisonMode || 'total'}
+                colorTheme={colorTheme}
             />
         </>
     );

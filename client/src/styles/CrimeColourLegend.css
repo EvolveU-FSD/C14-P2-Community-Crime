@@ -1,56 +1,109 @@
-.crime-color-legend {
-  position: fixed;
+.crime-colour-legend {
+  position: absolute;
   bottom: 20px;
-  left: 20px; /* Changed from right to left */
+  left: 20px;
   background-color: white;
   padding: 10px;
   border-radius: 4px;
   box-shadow: 0 1px 5px rgba(0,0,0,0.4);
-  z-index: 1000;
+  z-index: 800;
   width: 250px;
-  max-width: 25%;
-  opacity: 0.9;
-  pointer-events: none;
+  max-width: 30%;
+  opacity: 0.95;
 }
 
-.crime-color-legend h3 {
+.crime-colour-legend h4 {
   margin: 0 0 8px 0;
   font-size: 14px;
   color: #333;
   text-align: center;
 }
 
-.legend-container {
-  display: flex;
-  flex-direction: column;
-}
-
 .legend-gradient {
+  position: relative;
   height: 20px;
   border-radius: 2px;
-  margin-bottom: 5px;
+  margin-bottom: 25px; /* Space for labels below */
 }
 
-.legend-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #666;
-}
-
+/* Style the legend labels that show the values */
 .legend-label {
+  position: absolute;
+  transform: translateX(-50%); /* Center the label on its position */
+  bottom: -25px; /* Position below the gradient bar */
+  font-size: 11px;
+  color: #333;
+  white-space: nowrap;
+}
+
+/* Specific styling for different label types */
+.legend-label.low,
+.legend-label.decrease {
+  text-align: left;
+  transform: translateX(0); /* Left align first label */
+}
+
+.legend-label.high, 
+.legend-label.increase {
+  text-align: right;
+  transform: translateX(-100%); /* Right align last label */
+}
+
+.legend-label.mid,
+.legend-label.unchanged {
   text-align: center;
-  white-space: nowrap;  /* Prevent wrapping of numbers */
+}
+
+/* Add dots connecting labels to the gradient */
+.legend-label::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #666;
+}
+
+/* Color-specific markers */
+.legend-label.decrease::before,
+.legend-label.low::before {
+  left: 0;
+}
+
+.legend-label.increase::before,
+.legend-label.high::before {
+  left: 100%;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .crime-color-legend {
-    width: auto;
+  .crime-colour-legend {
+    width: 200px;
     min-width: 150px;
+    padding: 8px;
   }
   
   .legend-label {
-    font-size: 10px;  /* Smaller font on mobile */
+    font-size: 9px;
+  }
+  
+  .crime-colour-legend h4 {
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+  
+  .legend-gradient {
+    height: 15px;
+    margin-bottom: 20px;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 500px) {
+  .crime-colour-legend {
+    width: 150px;
   }
 }
