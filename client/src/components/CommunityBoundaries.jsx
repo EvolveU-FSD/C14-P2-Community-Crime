@@ -7,15 +7,35 @@ import CrimeColourLegend from "./CrimeColourLegend";
 import "../styles/CommunityPopup.css";
 
 export default function CommunityBoundaries() {
+    // Color constants - extracted from throughout the code
+    // Color constants - extracted from throughout the code
+const NEUTRAL_CHANGE_COLOUR = '#9E9E9E';  // Gray for unchanged values (was purple '#9D00FF')
+
+// Colors for decreased crime (positive change)
+const LIGHT_POSITIVE_CHANGE_COLOUR = '#81C784';  // Light blue-green
+const STRONG_POSITIVE_CHANGE_COLOUR = '#1E88E5';  // Deep blue
+
+// Colors for increased crime (negative change)
+const LIGHT_NEGATIVE_CHANGE_COLOUR = '#FDD835';  // Yellow
+const STRONG_NEGATIVE_CHANGE_COLOUR = '#D32F2F';  // Deep red
+
+// Middle color for total scale
+const MIDDLE_TOTAL_COLOUR = '#FFEB3B';  // Yellow (was empty)
+    
+    // Scale colors for maps
+    const TOTAL_SCALE_COLORS = [STRONG_POSITIVE_CHANGE_COLOUR, MIDDLE_TOTAL_COLOUR, STRONG_NEGATIVE_CHANGE_COLOUR];
+    const INCREASE_SCALE_COLORS = [LIGHT_NEGATIVE_CHANGE_COLOUR, STRONG_NEGATIVE_CHANGE_COLOUR];
+    const DECREASE_SCALE_COLORS = [STRONG_POSITIVE_CHANGE_COLOUR, LIGHT_POSITIVE_CHANGE_COLOUR];
+    
     const { filters } = useFilters();
     const [communityBoundary, setCommunityBoundary] = useState([]);
     const [maxCrime, setMaxCrime] = useState(0);
     const [maxDifference, setMaxDifference] = useState(0);
     const [minDifference, setMinDifference] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
-    const [currentData, setCurrentData] = useState({}); 
-    const [startData, setStartData] = useState({}); 
-    const [fromDateSummary, setFromDateSummary] = useState([]); 
+    const [currentData, setCurrentData] = useState({});
+    const [startData, setStartData] = useState({});
+    const [fromDateSummary, setFromDateSummary] = useState([]);
 
     // Build a reusable function that may be extracted out for leaflet usable coordinates.
     function swapGeoJsonCoordinates(geojson) {
@@ -199,24 +219,24 @@ export default function CommunityBoundaries() {
     }, [filters]);
 
     // Scale for total mode - green to red
-    const totalScale = chroma.scale(['#00ff00', '#ffff00', '#ff0000'])
+    const totalScale = chroma.scale(TOTAL_SCALE_COLORS)
         .domain([0, maxCrime]);
         
     const differenceScale = (value) => {
         // If no change or both values are 0, use blue
-        if (value === 0) return chroma('#2196F3');
+        if (value === 0) return chroma(NEUTRAL_CHANGE_COLOUR);
         
         // Get max absolute value for proper scaling
         const absMax = Math.max(Math.abs(minDifference), Math.abs(maxDifference));
-        if (absMax === 0) return chroma('#2196F3'); // Handle edge case
+        if (absMax === 0) return chroma(NEUTRAL_CHANGE_COLOUR); // Handle edge case
         
         if (value > 0) {
             // Positive difference (increase) - use red scale
-            return chroma.scale(['#FFEB3B', '#FF9800', '#F44336'])
+            return chroma.scale(INCREASE_SCALE_COLORS)
                 .domain([0, absMax])(value);
         } else {
             // Negative difference (decrease) - use green scale
-            return chroma.scale(['#4CAF50', '#8BC34A', '#CDDC39'])
+            return chroma.scale(DECREASE_SCALE_COLORS)
                 .domain([-absMax, 0])(value);
         }
     };
@@ -227,7 +247,7 @@ export default function CommunityBoundaries() {
         
         const isZeroCrime = isDifferenceMode && community.totalCrimes === 0 && community.startValue === 0;
         const color = isZeroCrime 
-            ? chroma('#2196F3').hex() 
+            ? chroma(NEUTRAL_CHANGE_COLOUR).hex() 
             : isDifferenceMode 
             ? differenceScale(community.difference).hex() 
             : totalScale(community.totalCrimes).hex();
@@ -235,8 +255,8 @@ export default function CommunityBoundaries() {
         return {
             color,
             fillColor: color,
-            fillOpacity: 0.3,
-            weight: 4
+            fillOpacity: 0.5,
+            weight: 2.5
         };
     };
 
