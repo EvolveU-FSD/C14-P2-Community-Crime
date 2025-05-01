@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useFilters } from "../context/FilterContext";
+import { useColorTheme } from "../context/ColorThemeContext";
 import { Polygon, Popup } from 'react-leaflet';
 import chroma from "chroma-js";
 import BoundsControl from "./BoundsControl";
@@ -7,25 +8,9 @@ import CrimeColourLegend from "./CrimeColourLegend";
 import "../styles/CommunityPopup.css";
 
 export default function CommunityBoundaries() {
-    // Color constants - extracted from throughout the code
-    // Color constants - extracted from throughout the code
-const NEUTRAL_CHANGE_COLOUR = '#9E9E9E';  // Gray for unchanged values (was purple '#9D00FF')
-
-// Colors for decreased crime (positive change)
-const LIGHT_POSITIVE_CHANGE_COLOUR = '#81C784';  // Light blue-green
-const STRONG_POSITIVE_CHANGE_COLOUR = '#1E88E5';  // Deep blue
-
-// Colors for increased crime (negative change)
-const LIGHT_NEGATIVE_CHANGE_COLOUR = '#FDD835';  // Yellow
-const STRONG_NEGATIVE_CHANGE_COLOUR = '#D32F2F';  // Deep red
-
-// Middle color for total scale
-const MIDDLE_TOTAL_COLOUR = '#FFEB3B';  // Yellow (was empty)
-    
-    // Scale colors for maps
-    const TOTAL_SCALE_COLORS = [STRONG_POSITIVE_CHANGE_COLOUR, MIDDLE_TOTAL_COLOUR, STRONG_NEGATIVE_CHANGE_COLOUR];
-    const INCREASE_SCALE_COLORS = [LIGHT_NEGATIVE_CHANGE_COLOUR, STRONG_NEGATIVE_CHANGE_COLOUR];
-    const DECREASE_SCALE_COLORS = [STRONG_POSITIVE_CHANGE_COLOUR, LIGHT_POSITIVE_CHANGE_COLOUR];
+    // Get the color theme from context
+    const colorTheme = useColorTheme();
+    const { totalScale, increaseScale, decreaseScale } = colorTheme.getScaleColors();
     
     const { filters } = useFilters();
     const [communityBoundary, setCommunityBoundary] = useState([]);
@@ -218,25 +203,25 @@ const MIDDLE_TOTAL_COLOUR = '#FFEB3B';  // Yellow (was empty)
         fetchFilteredCommunityData();
     }, [filters]);
 
-    // Scale for total mode - green to red
-    const totalScale = chroma.scale(TOTAL_SCALE_COLORS)
+    // Update scale functions to use the theme colors
+    const totalScaleFunction = chroma.scale(totalScale)
         .domain([0, maxCrime]);
         
-    const differenceScale = (value) => {
-        // If no change or both values are 0, use blue
-        if (value === 0) return chroma(NEUTRAL_CHANGE_COLOUR);
+    const differenceScaleFunction = (value) => {
+        // If no change or both values are 0, use neutral color
+        if (value === 0) return chroma(colorTheme.neutralChangeColor);
         
         // Get max absolute value for proper scaling
         const absMax = Math.max(Math.abs(minDifference), Math.abs(maxDifference));
-        if (absMax === 0) return chroma(NEUTRAL_CHANGE_COLOUR); // Handle edge case
+        if (absMax === 0) return chroma(colorTheme.neutralChangeColor); // Handle edge case
         
         if (value > 0) {
-            // Positive difference (increase) - use red scale
-            return chroma.scale(INCREASE_SCALE_COLORS)
+            // Positive difference (increase) - use negative scale (red)
+            return chroma.scale(increaseScale)
                 .domain([0, absMax])(value);
         } else {
-            // Negative difference (decrease) - use green scale
-            return chroma.scale(DECREASE_SCALE_COLORS)
+            // Negative difference (decrease) - use positive scale (blue)
+            return chroma.scale(decreaseScale)
                 .domain([-absMax, 0])(value);
         }
     };
@@ -247,10 +232,10 @@ const MIDDLE_TOTAL_COLOUR = '#FFEB3B';  // Yellow (was empty)
         
         const isZeroCrime = isDifferenceMode && community.totalCrimes === 0 && community.startValue === 0;
         const color = isZeroCrime 
-            ? chroma(NEUTRAL_CHANGE_COLOUR).hex() 
+            ? chroma(colorTheme.neutralChangeColor).hex() 
             : isDifferenceMode 
-            ? differenceScale(community.difference).hex() 
-            : totalScale(community.totalCrimes).hex();
+            ? differenceScaleFunction(community.difference).hex() 
+            : totalScaleFunction(community.totalCrimes).hex();
 
         return {
             color,
@@ -259,7 +244,7 @@ const MIDDLE_TOTAL_COLOUR = '#FFEB3B';  // Yellow (was empty)
             weight: 2.5
         };
     };
-
+    
     // Helper function for difference mode to merge and compare crime data 
     const prepareDifferenceBreakdown = (community) => {
         if (!community || !community.crimesByCategory) return [];
@@ -345,6 +330,11 @@ const MIDDLE_TOTAL_COLOUR = '#FFEB3B';  // Yellow (was empty)
                     const crimeData = processAndSummarizeCrimeData(community.crimesByCategory);
                     const isDifferenceMode = filters.dateRangeFilter?.comparisonMode === 'difference';
                     
+                    // Get appropriate CSS class for difference styling
+                    const changeClass = community.totalCrimes === 0 && community.startValue === 0 
+                        ? 'zero-crime' 
+                        : colorTheme.getChangeClass(community.difference);
+                    
                     return (
                         <Polygon
                             key={community._id}
@@ -362,15 +352,7 @@ const MIDDLE_TOTAL_COLOUR = '#FFEB3B';  // Yellow (was empty)
                                                 From Date: <span>{community.startValue}</span>
                                                 &nbsp;&nbsp;To Date: <span>{community.totalCrimes}</span>
                                             </p>
-                                            <p className={`crime-difference ${
-                                                community.totalCrimes === 0 && community.startValue === 0 
-                                                    ? 'zero-crime' 
-                                                    : community.difference > 0 
-                                                        ? 'increase' 
-                                                        : community.difference < 0 
-                                                            ? 'decrease' 
-                                                            : 'unchanged'
-                                            }`}>
+                                            <p className={`crime-difference ${changeClass}`}>
                                                 {community.totalCrimes === 0 && community.startValue === 0 ? (
                                                     <>No crimes recorded in either period</>
                                                 ) : (
@@ -385,7 +367,7 @@ const MIDDLE_TOTAL_COLOUR = '#FFEB3B';  // Yellow (was empty)
                                                 )}
                                             </p>
                                             
-                                            {/* Crime breakdown comparison table */}
+                                            {/* Comparison table with consistent color classes */}
                                             <div className="crime-comparison">
                                                 <h4>Crime Comparison:</h4>
                                                 <div className="comparison-table-container">
@@ -401,13 +383,7 @@ const MIDDLE_TOTAL_COLOUR = '#FFEB3B';  // Yellow (was empty)
                                                         <tbody>
                                                             {community.crimesByCategory && community.crimesByCategory.length > 0 ? (
                                                                 prepareDifferenceBreakdown(community).map((item, index) => (
-                                                                    <tr key={index} className={
-                                                                        item.difference > 0 
-                                                                            ? 'row-increase' 
-                                                                            : item.difference < 0 
-                                                                                ? 'row-decrease' 
-                                                                                : 'row-unchanged'
-                                                                    }>
+                                                                    <tr key={index} className={`row-${colorTheme.getChangeClass(item.difference)}`}>
                                                                         <td className="crime-type-cell">{item.category}</td>
                                                                         <td>{item.from}</td>
                                                                         <td>{item.to}</td>
@@ -487,7 +463,7 @@ const MIDDLE_TOTAL_COLOUR = '#FFEB3B';  // Yellow (was empty)
             </BoundsControl>
 
             <CrimeColourLegend 
-                scale={filters.dateRangeFilter?.comparisonMode === 'difference' ? differenceScale : totalScale} 
+                scale={filters.dateRangeFilter?.comparisonMode === 'difference' ? differenceScaleFunction : totalScaleFunction} 
                 maxValue={filters.dateRangeFilter?.comparisonMode === 'difference' 
                     ? Math.max(Math.abs(minDifference), Math.abs(maxDifference)) 
                     : maxCrime} 
@@ -495,6 +471,7 @@ const MIDDLE_TOTAL_COLOUR = '#FFEB3B';  // Yellow (was empty)
                     ? -Math.max(Math.abs(minDifference), Math.abs(maxDifference)) 
                     : 0}
                 mode={filters.dateRangeFilter?.comparisonMode || 'total'}
+                colorTheme={colorTheme}
             />
         </>
     );
