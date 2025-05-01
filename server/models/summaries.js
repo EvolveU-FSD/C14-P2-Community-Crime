@@ -14,7 +14,25 @@ export async function getCrimesByCommunity(filters) {
     
     // Add community filter
     if (communitiesListFilter?.length > 0) {
-        matchCondition.community = { $in: communitiesListFilter.map(c => c.label) };
+        const communityLabels = communitiesListFilter.map(c => c.label);
+        const orConditions = [];
+        
+        communityLabels.forEach(label => {
+            const noSpacesLabel = label.replace(/\s+/g, '');
+            orConditions.push(
+                { community: label },
+                { 
+                    $expr: { 
+                        $eq: [
+                            { $replaceAll: { input: "$community", find: " ", replacement: "" } },
+                            noSpacesLabel
+                        ] 
+                    } 
+                }
+            );
+        });
+        
+        matchCondition.$or = orConditions;
     }
 
     // Add crime filter
@@ -22,7 +40,7 @@ export async function getCrimesByCommunity(filters) {
         matchCondition.category = { $in: crimeListFilter.map(c => c.value) };
     }
     
-    // Add date range filter
+    // Add date filter
     if (dateRangeFilter?.startYear) {
         // Create date conditions
         const dateConditions = [];
@@ -65,7 +83,12 @@ export async function getCrimesByCommunity(filters) {
         
         // Add date conditions to main match
         if (dateConditions.length > 0) {
-            matchCondition.$and = dateConditions;
+            // If we already have $or from community filters, we need to use $and to combine with date conditions
+            if (matchCondition.$or) {
+                matchCondition.$and = dateConditions;
+            } else {
+                matchCondition.$and = dateConditions;
+            }
         }
     }
 
@@ -98,7 +121,15 @@ export async function getCrimesByCommunity(filters) {
                         {
                             $match: {
                                 $expr: {
-                                    $eq: ["$name", "$$communityName"]
+                                    $or: [
+                                        { $eq: ["$name", "$$communityName"] },
+                                        { 
+                                            $eq: [
+                                                { $replaceAll: { input: "$name", find: " ", replacement: "" } },
+                                                { $replaceAll: { input: "$$communityName", find: " ", replacement: "" } }
+                                            ] 
+                                        }
+                                    ]
                                 }
                             }
                         },
@@ -116,15 +147,9 @@ export async function getCrimesByCommunity(filters) {
                 }
             },
             {
-                // Unwind the array from the lookup.
                 $unwind: "$communityInfo"
-                // $unwind: {
-                //     path: "$communityInfo",
-                //     preserveNullAndEmptyArrays: true
-                // }
             },
             {
-                // Shape the output.
                 $project: {
                     _id: 1,
                     totalCrimes: 1,
@@ -157,7 +182,25 @@ export async function getCrimesByCategorySingleMonthAndYear(year, month, communi
     
     // Add community filter
     if (communitiesListFilter?.length > 0) {
-        matchCondition.community = { $in: communitiesListFilter.map(c => c.label) };
+        const communityLabels = communitiesListFilter.map(c => c.label);
+        const orConditions = [];
+        
+        communityLabels.forEach(label => {
+            const noSpacesLabel = label.replace(/\s+/g, '');
+            orConditions.push(
+                { community: label },
+                { 
+                    $expr: { 
+                        $eq: [
+                            { $replaceAll: { input: "$community", find: " ", replacement: "" } },
+                            noSpacesLabel
+                        ] 
+                    } 
+                }
+            );
+        });
+        
+        matchCondition.$or = orConditions;
     }
 
     // Add crime filter
@@ -191,7 +234,15 @@ export async function getCrimesByCategorySingleMonthAndYear(year, month, communi
                         {
                             $match: {
                                 $expr: {
-                                    $eq: ["$name", "$$communityName"]
+                                    $or: [
+                                        { $eq: ["$name", "$$communityName"] },
+                                        { 
+                                            $eq: [
+                                                { $replaceAll: { input: "$name", find: " ", replacement: "" } },
+                                                { $replaceAll: { input: "$$communityName", find: " ", replacement: "" } }
+                                            ] 
+                                        }
+                                    ]
                                 }
                             }
                         },
@@ -237,9 +288,32 @@ export async function getCrimesByCategorySingleMonthAndYear(year, month, communi
 // that is passed in and gets the summary. This will be good for individual information pages and stats.
 export async function getCrimesByCategoryAndCommunity(community) {
     try {
-        const crimeSummary = CrimeRecord.aggregate([
+        let matchCondition;
+        
+        if (typeof community === 'string') {
+            // Create a version of the community name with spaces removed
+            const noSpacesCommunity = community.replace(/\s+/g, '');
+            
+            matchCondition = {
+                $or: [
+                    { community: community },
+                    { 
+                        $expr: { 
+                            $eq: [
+                                { $replaceAll: { input: "$community", find: " ", replacement: "" } },
+                                noSpacesCommunity
+                            ] 
+                        } 
+                    }
+                ]
+            };
+        } else {
+            matchCondition = { community: community };
+        }
+        
+        const crimeSummary = await CrimeRecord.aggregate([
             {
-                $match: { community: community }
+                $match: matchCondition
             },
             {
                 $group: {
@@ -280,7 +354,6 @@ export async function getCrimesByCommunityAndYear() {
                     "totalCrimes": -1
                 }
             }
-
         ]);
         return crimeSummary;
     } catch (error) {
